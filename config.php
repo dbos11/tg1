@@ -25,5 +25,5 @@ define('BOT_CHECKER_TOKEN', '7065299522:AAG7Z_MzHnR0gzj2YnOlC8O2coAemY3ptVI');
 define('WEBSITE', 'https://api.telegram.org/bot' . BOT_TOKEN);
 
 // URL вашего мини-приложения
-define('MINI_APP_URL', 'https://43cc1970b761.ngrok.app');
+define('MINI_APP_URL', 'https://43cc1970b761.ngrok.ap');
 ?>
