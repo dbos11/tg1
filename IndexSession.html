@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Telegram Mini App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1C1F24;
+            color: white;
+            overflow: hidden;
+            overflow-y: auto;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #2c2f33;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it is on top */
+        }
+
+        .spinner {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 10px 0;
+            background-color: #202225;
+        }
+        .header img {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+        .header span {
+            font-size: 20px;
+        }
+        .balance-container {
+            text-align: center;
+            margin-top: 75px;
+        }
+        .balance {
+            font-size: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .balance img {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        .league-container {
+            text-align: left;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 360px;
+
+        }
+        .league {
+            font-size: 12px;
+        }
+        .leagues {
+            display: flex;
+            align-items: center;
+        }
+        .leagues img{
+            width: 10px;
+            height: 10px;
+            margin-left: 5px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background-color: #2A2B30;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+            margin-left: 0px;
+            border: 2px solid #2D3035; /* Добавляем обводку */
+        }
+        .progress-bar-inner {
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+        }
+        .progress-bronze {
+            background: linear-gradient(90deg, #cd7f32 0%, #e6a163 100%) !important;
+        }
+
+        .progress-silver {
+            background: linear-gradient(90deg, #c0c0c0 0%, #d9d9d9 100%) !important;
+        }
+
+        .progress-gold {
+            background: linear-gradient(90deg, #ffd700 0%, #ffeb7a 100%) !important;
+        }
+
+        .progress-platinum {
+            background: linear-gradient(90deg, #e5e4e2 0%, #f5f5f5 100%) !important;
+        }
+
+        .progress-diamond {
+            background: linear-gradient(90deg, #61E1FF 0%, #e3f7ff 100%) !important;
+        }
+        .hamster-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            overflow: visible;
+            margin-top: 20px;
+            background-color: #fff;
+            cursor: pointer;
+            border: none;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hamster-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .energy-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .energy {
+            font-size: 18px;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .energy img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        .boost-button {
+            background-color: transparent;
+            color: white;
+            
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            margin-left: 160px;
+        }
+        .boost-button img {
+            width: 20px;
+            height: 20px;
+        }
+        .damage {
+            position: absolute;
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            animation: floatUp 0.5s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px);
+            }
+        }
+        .reward-details {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #2c2f33;
+            color: white;
+            padding: 20px;
+            border-radius: 25px 25px 0 0;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 2;
+            text-align: center;
+            
+        }
+        .reward-details.active {
+            transform: translateY(0);
+            box-shadow: 0 0 10px 2px #ff9900; /* Glowing border */
+        }
+        .reward-details .reward-amount {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+            margin-bottom: 10px;
+        }
+        .reward-details .reward-description {
+            font-size: 14px;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .reward-details .reward-button {
+            background-color: #ff7e5f;
+            border: none;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .reward-details .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            display: none;
+        }
+        .overlay.active {
+            display: block;
+        }
+        .balance-increase {
+            transition: transform 0.5s ease-in-out;
+        }
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            background-color: #282B30;
+            padding: 5px 5px;
+            border-radius: 20px;
+            width: 90%;
+        }
+        .menu button {
+            background-color: transparent;
+            color: white;
+            border: none;
+            padding: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .menu button img {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 5px;
+        }
+        .menu button.active {
+            background-color: #1C1F24;
+            border-radius: 20px;
+        }
+        .overlay2 {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            z-index: 1000;
+        }
+        .overlay2-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #balance {
+            transition: all 0.5s ease-out;
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script src="configJS.js"></script>
+</head>
+<body>
+    <div id="overlay2" class="overlay2">
+        <div class="overlay-content">
+            Игра с компьютера не поддерживается. Пожалуйста, используйте мобильное устройство.
+        </div>
+    </div>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner"></div>
+    </div>
+    <div class="header">
+        <img src="default_profile_img.png" alt="User Icon" id="profileImg">
+        <span id="username">Имя пользователя</span>
+    </div>
+
+    <div class="balance-container">
+        <div class="balance">
+            <img src="Elements/coin_icon.svg" alt="coin">
+            <span id="balance">0</span>
+        </div>
+        <div class="league-container" onclick="openLeagueMenu()">
+            <div class="leagues">
+                <div class="league" id="league">
+                    Bronze 
+                </div>
+                <img src="Elements/arrow.png" alt="League Image">
+            </div>
+            <div class="progress-bar">
+                <div class="progress-bar-inner" id="progress-bar-inner"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hamster-container"  id="vibrateButton">
+        <img src="Elements/coin_icon.svg" alt="hamster">
+    </div>
+
+    <div class="energy-container">
+        <div class="energy">
+            <img src="energy_icon.png" alt="Energy Icon">
+            <span id="energy">100</span>
+            /
+            <span id="max-energy">100</span>
+        </div>
+        <button class="boost-button" onclick="openBoostMenu()">
+            <img src="boost.png" alt="boost icon">
+            Boost
+        </button>
+    </div>
+    <div class="overlay" id="overlay"></div>
+    <div class="reward-details" id="rewardDetails">
+        <button class="close-button" onclick="collectRewards()">✖</button>
+        <div class="reward-amount" id="rewardAmount"></div>
+        <div class="reward-description">Bot mined some coins for you</div>
+        <button class="reward-button" onclick="collectRewards()">Thanks</button>
+    </div>
+    <div class="menu">
+        <button class="active" onclick="navigate('index.html')">
+            <img src="mine_icon.png" alt="Mine">
+            Mine
+        </button>
+        <button onclick="navigate('friends.html')">
+            <img src="friends_icon.png" alt="Friends">
+            Friends
+        </button>
+        <button onclick="navigate('earn.html')">
+            <img src="earn_icon.png" alt="Earn">
+            Earn
+        </button>
+        <button onclick="navigate('earn.html')">
+            <img src="cards_icon.png" alt="Cards">
+            Cards
+        </button>
+        <button onclick="navigate('wallet.html')">
+            <img src="wallet_icon.png" alt="Wallet">
+            Wallet
+        </button>
+    </div>
+
+    <script>
+        eruda.init();
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+        Telegram.WebApp.BackButton.hide();
+
+
+        let balance = 0;
+        let energy = 100;
+        let maxEnergy = 100;
+        let currentLeague = 'Bronze';
+        let damageAmount = 1;
+        let energyRecoveryLevel = 1;
+        let multiplier = 1;
+        let pendingCoins = 0;
+
+        const loadingScreen = document.getElementById('loadingScreen');
+
+        function saveBalanceToSessionStorage() {
+            sessionStorage.setItem('balance', balance);
+        }
+
+        function saveEnergyToSessionStorage() {
+            sessionStorage.setItem('current_energy', energy);
+            sessionStorage.setItem('max_energy', maxEnergy);
+        }
+
+        function saveLeagueToSessionStorage() {
+            sessionStorage.setItem('currentLeague', currentLeague);
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const hamsterContainer = document.getElementById('vibrateButton');
+            const activeTouches = new Set();
+        
+            hamsterContainer.addEventListener('touchstart', (event) => {
+                event.preventDefault(); // Предотвращаем вызов клика по умолчанию
+                for (let i = 0; i < event.touches.length; i++) {
+                    const touch = event.touches[i];
+                    if (!activeTouches.has(touch.identifier) && isTouchInsideCircle(touch, hamsterContainer)) {
+                        activeTouches.add(touch.identifier);
+                        handleTouch(touch);
+                    }
+                }
+            });
+        
+            hamsterContainer.addEventListener('touchend', (event) => {
+                for (let i = 0; i < event.changedTouches.length; i++) {
+                    const touch = event.changedTouches[i];
+                    activeTouches.delete(touch.identifier);
+                }
+            });
+        
+            function handleTouch(touch) {
+                // Прямо вызываем функцию обработки баланса
+                increaseBalance(touch);
+            }
+        
+            function isTouchInsideCircle(touch, element) {
+                const rect = element.getBoundingClientRect();
+                const radius = rect.width / 2;
+                const centerX = rect.left + radius;
+                const centerY = rect.top + radius;
+                const touchX = touch.clientX;
+                const touchY = touch.clientY;
+                const distance = Math.sqrt(Math.pow(touchX - centerX, 2) + Math.pow(touchY - centerY, 2));
+                return distance <= radius;
+            }
+        });
+        
+        function increaseBalance(event) {
+            // Извлекаем данные из session storage
+            let energy = parseInt(sessionStorage.getItem('current_energy'));
+            const damageAmount = parseInt(sessionStorage.getItem('damage_amount'));
+            const multiplier = parseFloat(sessionStorage.getItem('multiplier') || 1); // Если multiplier не установлен, используем значение 1
+        
+            // Проверка на корректность данных
+            if (!isNaN(energy) && !isNaN(damageAmount)) {
+                if (energy >= damageAmount) {
+                    const adjustedDamage = damageAmount * multiplier;
+                    let balance = parseInt(sessionStorage.getItem('balance') || 0); // Если balance не установлен, используем значение 0
+        
+                    // Обновляем значения
+                    balance += adjustedDamage;
+                    energy -= damageAmount;
+        
+                    const nextLeagueMinBalance = getNextLeagueMinBalance(currentLeague);
+                    if (balance >= nextLeagueMinBalance) {
+                        currentLeague = getNextLeague(currentLeague);
+                        sessionStorage.setItem('league', currentLeague);
+                    }
+        
+                    // Сохраняем обновленные значения в session storage
+                    sessionStorage.setItem('balance', balance);
+                    sessionStorage.setItem('current_energy', energy);
+        
+                    // Отображаем изменения на UI
+                    showDamage(event, adjustedDamage);
+                    updateBalance();
+                    updateEnergy();
+                    updateProgress();
+                    updateLeague();
+        
+                    // Вызов легкой вибрации
+                    const haptic = Telegram.WebApp.HapticFeedback;
+                    haptic.impactOccurred('heavy');
+                }
+            } else {
+                console.error('Error: Invalid data in session storage.');
+            }
+        }
+
+
+
+        function hideLoadingScreen() {
+            loadingScreen.style.display = 'none';
+        }
+
+        function showLoadingScreen() {
+            loadingScreen.style.display = 'flex';
+        }
+
+
+        function checkAndResetMultiplier() {
+            const turboEndTime = parseInt(sessionStorage.getItem('turbo_end_time'), 10);
+            const currentTime = Math.floor(Date.now() / 1000); // Текущее время в секундах
+        
+            if (!isNaN(turboEndTime) && currentTime >= turboEndTime) {
+                const userId = Telegram.WebApp.initDataUnsafe.user.id;
+                sessionStorage.removeItem('multiplier');
+                sessionStorage.removeItem('turbo_end_time');
+            }
+        }
+        
+
+
+
+    
+
+        /*function increaseBalance(event) {
+            if (energy >= damageAmount) {
+                const adjustedDamage = damageAmount * multiplier;
+                balance += adjustedDamage;
+                energy -= damageAmount;
+                showDamage(event, adjustedDamage);
+                updateBalance();
+                updateEnergy();
+                updateProgress();
+                const haptic = Telegram.WebApp.HapticFeedback;
+        
+                // Вызов легкой вибрации
+                haptic.impactOccurred('medium');
+                
+
+                const userId = Telegram.WebApp.initDataUnsafe.user.id;
+                fetch(`${CONFIG.BASE_URL}update_balance_and_league.php?telegram_id=${userId}&balance=${balance}&energy_used=${damageAmount}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            fetchUserData();
+                        } else {
+                            console.error('Error updating balance and league:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating balance and league:', error);
+                    });
+            }
+        }*/
+
+        function showDamage(event, amount) {
+            const hamsterContainer = document.querySelector('.hamster-container');
+            const damageElement = document.createElement('div');
+            damageElement.className = 'damage';
+            damageElement.innerText = `+${amount}`;
+
+            const x = event.clientX - hamsterContainer.getBoundingClientRect().left;
+            const y = event.clientY - hamsterContainer.getBoundingClientRect().top;
+
+            damageElement.style.left = `${x}px`;
+            damageElement.style.top = `${y}px`;
+
+            hamsterContainer.appendChild(damageElement);
+
+            setTimeout(() => {
+                damageElement.remove();
+            }, 1000);
+        }
+
+        function setBalance() {
+            const balanceElement = document.getElementById('balance');
+            const balance = sessionStorage.getItem('balance');
+            if (balance !== null) {
+                // Преобразование строки баланса в число и форматирование
+                const formattedBalance = Number(balance).toLocaleString('ru-RU');
+                balanceElement.innerText = formattedBalance;
+            }
+        }
+
+
+        function updateBalance() {
+            const balanceElement = document.getElementById('balance');
+            const newBalance = parseInt(sessionStorage.getItem('balance'), 10);
+        
+            // Удаляем пробелы из текущего баланса и преобразуем его в число
+            const currentBalance = parseInt(balanceElement.innerText.replace(/\s/g, ''), 10);
+            
+            // Если текущий баланс меньше нового, будем его увеличивать
+            if (currentBalance < newBalance) {
+                let increment = currentBalance;
+                const interval = setInterval(() => {
+                    increment++;
+                    balanceElement.innerText = increment.toLocaleString('ru-RU');
+        
+                    if (increment >= newBalance) {
+                        clearInterval(interval);
+                    }
+                }, 10); // скорость увеличения числа, можно настроить
+            } else {
+                balanceElement.innerText = newBalance.toLocaleString('ru-RU');
+            }
+        }
+
+
+
+        function updateEnergy() {
+            const savedEnergy = parseInt(sessionStorage.getItem('current_energy'), 10);
+            const savedMaxEnergy = parseInt(sessionStorage.getItem('max_energy'), 10);
+            
+            document.getElementById('energy').innerText = savedEnergy;
+            document.getElementById('max-energy').innerText = savedMaxEnergy;
+        }
+
+        function updateLeague() {
+            let currentLeague = sessionStorage.getItem('league');
+            document.getElementById('league').innerText = currentLeague;
+        }
+
+
+        const leagues = {
+            'Bronze': 0,
+            'Silver': 10,
+            'Gold': 50,
+            'Platinum': 100,
+            'Diamond': 200
+        };
+
+        function updateProgress() {
+            const progressElement = document.getElementById('progress-bar-inner');
+            const currentLeague = sessionStorage.getItem('league') || 'Bronze';
+            const leagueMinBalance = getLeagueMinBalance(currentLeague);
+            const nextLeagueMinBalance = getNextLeagueMinBalance(currentLeague);
+            const balance = parseInt(sessionStorage.getItem('balance'), 10);
+            const progressPercentage = (balance / nextLeagueMinBalance) * 100;
+            // Прогрес от лиги до лиги
+            // const progressPercentage = ((balance - leagueMinBalance) / (nextLeagueMinBalance - leagueMinBalance)) * 100;
+            progressElement.classList.remove('progress-bronze', 'progress-silver', 'progress-gold', 'progress-platinum', 'progress-diamond');
+
+            // Add the appropriate progress bar class
+            const progressClass = `progress-${currentLeague.toLowerCase()}`;
+            progressElement.classList.add(progressClass);
+
+            progressElement.style.width = Math.min(progressPercentage, 100) + '%';
+        }
+
+        function getNextLeagueMinBalance(currentLeague) {
+            const nextLeague = getNextLeague(currentLeague);
+            return leagues[nextLeague];
+        }
+
+        function getLeagueMinBalance(league) {
+            return leagues[league];
+        }
+
+        function getNextLeague(currentLeague) {
+            const leagueKeys = Object.keys(leagues);
+            const currentIndex = leagueKeys.indexOf(currentLeague);
+            const nextIndex = currentIndex + 1;
+            return nextIndex < leagueKeys.length ? leagueKeys[nextIndex] : currentLeague;
+        }
+
+
+        function fetchUserData() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            return fetch(`${CONFIG.BASE_URL}get_balance_energy_and_league.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        balance = data.balance;
+                        energy = data.current_energy;
+                        maxEnergy = 100 + 10 * (data.energy_level - 1);
+                        currentLeague = data.league;
+                        damageAmount = data.damage_level;
+                        energyRecoveryLevel = data.energy_recovery_level;
+                        dailyFullEnergyCount = data.daily_full_energy_count;
+                        dailyTurboCount = data.daily_turbo_count;
+                        energyLevel = data.energy_level;
+                        miningBotStatus = data.mining_bot_status;
+        
+                        // Сохранение данных в session storage
+                        sessionStorage.setItem('balance', balance);
+                        sessionStorage.setItem('current_energy', energy);
+                        sessionStorage.setItem('max_energy', maxEnergy);
+                        sessionStorage.setItem('league', currentLeague);
+                        sessionStorage.setItem('damage_amount', damageAmount);
+                        sessionStorage.setItem('energy_recovery_level', energyRecoveryLevel);
+                        sessionStorage.setItem('daily_full_energy_count', dailyFullEnergyCount);
+                        sessionStorage.setItem('daily_turbo_count', dailyTurboCount);
+                        sessionStorage.setItem('energy_level', energyLevel);
+                        sessionStorage.setItem('mining_bot_status', miningBotStatus);
+        
+                        // Обновление UI
+                        setBalance();
+                        updateEnergy();
+                        updateLeague();
+                        updateProgress();
+                    } else {
+                        console.error('Error fetching user data:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                });
+        }
+
+
+
+
+
+        function regenerateEnergy() {
+            // Извлекаем данные из session storage
+            let energy = parseInt(sessionStorage.getItem('current_energy'));
+            const maxEnergy = parseInt(sessionStorage.getItem('max_energy'));
+            const energyRecoveryLevel = parseInt(sessionStorage.getItem('energy_recovery_level'));
+        
+            if (!isNaN(energy) && !isNaN(maxEnergy) && !isNaN(energyRecoveryLevel)) {
+                // Рассчитываем новое значение энергии
+                const regeneratedEnergy = energy + energyRecoveryLevel;
+                energy = Math.min(regeneratedEnergy, maxEnergy);
+
+                // Сохраняем новое значение энергии в session storage
+                sessionStorage.setItem('current_energy', energy);
+
+                // Обновляем интерфейс
+                updateEnergy();
+            } else {
+                console.error('Error: Invalid energy data in session storage.');
+            }
+        }
+
+        function openLeagueMenu() {
+            window.location.href = 'leagues.html';
+        }
+
+        function openBoostMenu() {
+            window.location.href = 'boost.html';
+        }
+
+        function navigate(page) {
+            window.location.href = `${page}`;
+        }
+
+        function getUserData() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            return fetch(`${CONFIG.BASE_URL}get_user_profile.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const user = data.user;
+                        document.getElementById('username').innerText = user.full_name;
+                        const profileImgElement = document.getElementById('profileImg');
+                        profileImgElement.src = user.profile_img_url;
+                        profileImgElement.onerror = function() {
+                            profileImgElement.src = 'default_profile_img.png';
+                        };
+
+                        localStorage.setItem('userData', JSON.stringify({
+                            username: user.full_name,
+                            profileImg: user.profile_img_url
+                        }));
+                    } else {
+                        console.error('Error fetching user profile:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user profile:', error);
+                });
+        }
+
+        function parseStartParam() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const startParam = urlParams.get('tgWebAppStartParam');
+            if (startParam) {
+                const userId = Telegram.WebApp.initDataUnsafe.user.id;
+                const username = Telegram.WebApp.initDataUnsafe.user.username || '';
+                const fullName = `${Telegram.WebApp.initDataUnsafe.user.first_name || ''} ${Telegram.WebApp.initDataUnsafe.user.last_name || ''}`.trim();
+                const profileImgUrl = Telegram.WebApp.initDataUnsafe.user.photo_url || 'default_profile_img.png';
+                addUser(userId, username, profileImgUrl, fullName, startParam);
+            }
+        }
+
+        function addUser(userId, username, profileImgUrl, fullName, invitedByCode) {
+            fetch(`${CONFIG.BASE_URL}add_user.php?telegram_id=${userId}&username=${username}&full_name=${fullName}&profile_img_url=${profileImgUrl}&invited_by_code=${invitedByCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('User added successfully.');
+                    } else {
+                        console.error('Error adding user:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding user:', error);
+                });
+        }
+
+        function sendMessageWithButton(text, buttonText, buttonUrl) {
+            const xhr = new XMLHttpRequest();
+            const url = `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/sendMessage`;
+            const chatId = Telegram.WebApp.initDataUnsafe.user.id;
+            const params = JSON.stringify({
+                chat_id: chatId,
+                text: text,
+                reply_markup: {
+                    inline_keyboard: [[
+                    {
+                        text: buttonText,
+                        url: buttonUrl
+                    }
+                  ]]
+                }
+            });
+
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log('Message sent successfully');
+                } else if (xhr.readyState === 4) {
+                    console.error('Error sending message:', xhr.responseText);
+                }
+            };
+            xhr.send(params);
+        }
+
+        function checkAndSendMessage(text, buttonText, buttonUrl) {
+            const chatId = Telegram.WebApp.initDataUnsafe.user.id;
+            const getChatMemberCountUrl = `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getChatMemberCount?chat_id=${chatId}`;
+
+            // Проверка количества участников в чате
+            fetch(getChatMemberCountUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok && data.result === 1) {
+                // Отправка сообщения с инлайн-кнопкой
+                    sendMessageWithButton(chatId, text, buttonText, buttonUrl);
+                } else {
+                console.log('Chat is active, not sending new message');
+                }
+            })
+            .catch(error => {
+            console.error('Error checking chat:', error);
+            });
+        }
+
+        function recordActivity() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}record_activity.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('User activity recorded successfully.');
+                    } else {
+                        console.error('Error recording user activity:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error recording user activity:', error);
+                });
+        }
+
+        function updateLastActivity() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}update_last_activity.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('Error updating last activity:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating last activity:', error);
+                });
+        }
+
+        function showRewardDetails(coins) {
+            pendingCoins = coins;
+            document.getElementById('rewardAmount').innerText = `+${coins} coins`;
+            document.getElementById('rewardDetails').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closeRewardDetails() {
+            document.getElementById('rewardDetails').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        function checkRewards() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            return fetch(`${CONFIG.BASE_URL}collect_rewards.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.coins_earned > 0) {
+                        showRewardDetails(data.coins_earned);
+                    }
+                })
+                .catch(error => console.error('Error collecting rewards:', error));
+        }
+
+        function animateBalanceIncrease(coins) {
+            const balanceElement = document.getElementById('balance');
+            const currentBalance = parseInt(balanceElement.innerText);
+            const targetBalance = currentBalance + coins;
+            let current = currentBalance;
+
+            const interval = setInterval(() => {
+                current += 1;
+                balanceElement.innerText = current;
+                balanceElement.classList.add('balance-increase');
+                if (current >= targetBalance) {
+                    clearInterval(interval);
+                    balanceElement.classList.remove('balance-increase');
+                }
+            }, 10);
+        }
+
+        function collectRewards() {
+            closeRewardDetails();
+        
+            // Получаем текущие значения из sessionStorage
+            let balance = parseInt(sessionStorage.getItem('balance') || 0);
+            let energy = parseInt(sessionStorage.getItem('current_energy') || 0);
+        
+            // Анимируем увеличение баланса
+            animateBalanceIncrease(pendingCoins);
+        
+            // Обновляем баланс
+            balance += pendingCoins;
+            sessionStorage.setItem('balance', balance);
+        
+            // Обновляем значения на UI
+            updateBalance();
+            updateEnergy();
+            updateProgress();
+        
+            // Обновляем данные на сервере
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}update_balance_and_league.php?telegram_id=${userId}&balance=${balance}&energy_used=0`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Обновляем данные пользователя после успешного обновления баланса
+                        sessionStorage.setItem('balance', balance);
+                        sessionStorage.setItem('current_energy', energy);
+        
+                        updateBalance();
+                        updateEnergy();
+                        updateProgress();
+                    } else {
+                        console.error('Error updating balance and league:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating balance and league:', error);
+                });
+        }
+
+
+        function isMobileDevice() {
+            return /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent);
+        }
+
+        window.onload = function() {
+            if (!isMobileDevice()) {
+                document.getElementById('overlay2').style.display = 'block';
+                var scripts = document.getElementsByTagName('script');
+                for (var i = 0; i < scripts.length; i++) {
+                    if (scripts[i] !== document.currentScript) {
+                        scripts[i].parentNode.removeChild(scripts[i]);
+                    }
+                }
+            }
+        };
+
+        function sendDataToServer() {
+            // Извлекаем данные из session storage
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            const balance = sessionStorage.getItem('balance');
+            const currentLeague = sessionStorage.getItem('league');
+            const currentEnergy = sessionStorage.getItem('current_energy');
+            const lastEnergyUpdate = new Date().toISOString(); // Текущее время
+
+            // Проверка на наличие данных
+            if (balance !== null && currentLeague !== null && currentEnergy !== null) {
+                // Подготовка данных для отправки
+                const data = {
+                    telegram_id: userId,
+                    balance: balance,
+                    league: currentLeague,
+                    current_energy: currentEnergy,
+                    last_energy_update: lastEnergyUpdate
+                };
+
+                // Отправка данных на сервер
+                fetch(`${CONFIG.BASE_URL}update_user_and_boost.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Data successfully sent to the server.');
+                        // Обновляем время последнего обновления энергии в session storage
+                        sessionStorage.setItem('last_energy_update', lastEnergyUpdate);
+                    } else {
+                        console.error('Error sending data to the server:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending data to the server:', error);
+                });
+            } else {
+                console.error('Error: Missing data in session storage.');
+            }
+        }
+
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Telegram.WebApp.ready();
+            // Обёртка для requestWriteAccess для использования промисов
+            function requestWriteAccess() {
+                return new Promise((resolve, reject) => {
+                    const status = Telegram.WebApp.requestWriteAccess();
+                    if (status) {
+                        resolve(status);
+                    } else {
+                        reject('Request write access failed');
+                    }
+                });
+            }
+
+            requestWriteAccess().then((status) => {
+                console.log('Write access status:', status);
+                if (status && status.status === "allowed") {
+                    console.log('Write access granted');
+                    Telegram.WebApp.sendMessage('Thank you for granting write access!');
+                } else {
+                    console.error('Write access not granted:', status);
+                }
+            }).catch((error) => {
+                console.error('Failed to get write access:', error);
+            });
+            Telegram.WebApp.BackButton.hide();
+            Telegram.WebApp.expand();
+
+            //updateBalance2();
+            updateLeague();
+            
+
+            Promise.all([
+                //fetchAndLogMultiplier(),
+                getUserData(),
+                fetchUserData(),
+                parseStartParam(),
+                checkRewards()
+            ]).then(() => {
+                hideLoadingScreen();
+            }).catch((error) => {
+                console.error('Error during initialization:', error);
+                hideLoadingScreen(); // Hide even if there's an error
+            });
+
+            setInterval(regenerateEnergy, 1000);
+            checkAndSendMessage('Thank you for granting write access!', 'Open Web App', 'https://t.me/Testtestclickerclickerbot/start');
+            //setInterval(recordActivity, 10000); // Record activity every 10 seconds
+            setInterval(updateLastActivity, 60000); // Отправка активности каждые 5 секунд
+            // Запуск функции отправки данных на сервер раз в 5 минут (300000 миллисекунд)
+            setInterval(sendDataToServer, 5000);
+            setInterval(checkAndResetMultiplier, 1000);
+
+        });
+
+        setBalance();
+        updateEnergy();
+        updateProgress();
+    </script>
+</body>
+</html>

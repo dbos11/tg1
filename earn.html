@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Earn Rewards</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000000;
+            color: white;
+            overflow: hidden;
+            overflow-y: auto;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .task-container {
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+            padding: 0px;
+            background-color: #202225;
+            border-radius: 25px;
+            margin-bottom: 10px;
+        }
+        .task {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: #282B30;
+            border-radius: 25px;
+        }
+        .task img.icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+        }
+        .details {
+            flex-grow: 1;
+            padding-left: 10px;
+        }
+        .details .title {
+            font-size: 16px;
+            margin: 0;
+        }
+        .reward {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+        .reward img {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+        }
+        .reward span {
+            font-size: 14px;
+            color: #FFD700; /* Gold color */
+            font-weight: bold;
+        }
+        .task-button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .task-button {
+            background-color: #282B30;
+            border: none;
+            color: white;
+            padding: 5px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            flex-grow: 1;
+            margin: 5px;
+            margin-top: 10px;
+            font-size: 16px;
+            margin-left: 140px;
+        }
+        .task-button img {
+            width: 24px;
+            height: 24px;
+        }
+        .task-details {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #2c2f33;
+            color: white;
+            padding: 20px;
+            border-radius: 25px 25px 0 0;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 2;
+            text-align: center;
+        }
+        .task-details.active {
+            transform: translateY(0);
+            box-shadow: 0 0 10px 2px #ff9900; /* Glowing border */
+        }
+        .task-details img {
+            max-width: 100px; /* Adjust the size of the image as needed */
+            margin-bottom: 10px;
+            border-radius: 15px;
+        }
+        .task-details .task-name {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+            margin-bottom: 10px;
+        }
+        .task-details .task-description {
+            font-size: 14px;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .task-details .task-reward {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 28px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .task-details .task-reward img {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+            padding-top: 10px;
+        }
+        .task-details .task-button {
+            background-color: #ff7e5f;
+            border: none;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .task-details .task-button1 {
+            background-color: #ff7e5f;
+            border: none;
+            color: white;
+            padding: 25px 140px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 15px 0;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .task-details .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            display: none;
+        }
+        .overlay.active {
+            display: block;
+        }
+        .balance-container1 {
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+            margin-bottom: 0;
+            padding: 10px;
+            background-color: #000000;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            background-color: #282B30;
+            padding: 5px 5px;
+            border-radius: 20px;
+            width: 90%;
+        }
+        .menu button {
+            background-color: transparent;
+            color: white;
+            border: none;
+            padding: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .menu button img {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 5px;
+        }
+        .menu button.active {
+            background-color: #1C1F24;
+            border-radius: 20px;
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script src="configJS.js"></script>
+</head>
+<body>
+    <div class="balance-container1">
+        <span>Tasks</span>
+    </div>
+    <div class="task-container" id="taskContainer">
+        <!-- Tasks will be dynamically added here -->
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="task-details" id="taskDetails">
+        <button class="close-button" onclick="closeTaskDetails()">✖</button>
+        <img id="taskDetailsImage" src="" alt="Task Image">
+        <div class="task-name" id="taskDetailsName"></div>
+        <div class="task-description" id="taskDetailsDescription"></div>
+        <button class="task-button" id="taskSubscribeButton">Subscribe</button>
+        <div class="task-reward">
+            <img src="Elements/coin_icon.svg" alt="Reward">
+            <span id="taskDetailsReward"></span>
+        </div>
+        <button class="task-button1" id="taskCheckButton">Check</button>
+    </div>
+
+    <div class="menu">
+        <button onclick="navigate('index.html')">
+            <img src="mine_icon.png" alt="Mine">
+            Mine
+        </button>
+        <button onclick="navigate('friends.html')">
+            <img src="friends_icon.png" alt="Friends">
+            Friends
+        </button>
+        <button class="active" onclick="navigate('earn.html')">
+            <img src="earn_icon.png" alt="Earn">
+            Earn
+        </button>
+        <button onclick="navigate('earn.html')">
+            <img src="cards_icon.png" alt="Cards">
+            Cards
+        </button>
+        <button onclick="navigate('wallet.html')">
+            <img src="wallet_icon.png" alt="Wallet">
+            Wallet
+        </button>
+    </div>
+
+    <script>
+        eruda.init();
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+
+        function fetchTasks() {
+            fetch(`${CONFIG.BASE_URL}get_tasks.php`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const taskContainer = document.getElementById('taskContainer');
+                        taskContainer.innerHTML = '';
+                        data.tasks.forEach(task => {
+                            const taskElement = document.createElement('div');
+                            taskElement.className = 'task';
+                            taskElement.innerHTML = `
+                                <img src="${task.image_url}" alt="${task.task_name}" class="icon">
+                                <div class="details">
+                                    <span class="title">${task.task_name}</span>
+                                    <div class="reward">
+                                        <img src="Elements/coin_icon.svg" alt="Coin Icon">
+                                        <span>+${task.reward}</span>
+                                    </div>
+                                </div>
+                                <button class="task-button" onclick="openTaskDetails(${task.id}, '${task.task_name}', '${task.description}', '${task.reward}', '${task.link}', '${task.image_url}')">
+                                    <img src="Elements/arrow.png" alt="Details">
+                                </button>
+                            `;
+                            taskContainer.appendChild(taskElement);
+                        });
+                    } else {
+                        console.error('Error fetching tasks:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching tasks:', error);
+                });
+        }
+
+        function openTaskDetails(taskId, taskName, taskDescription, taskReward, taskLink, taskImageUrl) {
+            console.log('Opening task details:', taskId, taskName, taskDescription, taskReward, taskLink, taskImageUrl); // Debug log
+            document.getElementById('taskDetailsName').innerText = taskName;
+            document.getElementById('taskDetailsDescription').innerText = taskDescription;
+            document.getElementById('taskDetailsReward').innerText = `+${taskReward}`;
+            document.getElementById('taskSubscribeButton').onclick = () => subscribeTask(taskLink);
+            document.getElementById('taskCheckButton').setAttribute('data-task-id', taskId);
+            document.getElementById('taskDetailsImage').src = taskImageUrl;
+
+            document.getElementById('taskDetails').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closeTaskDetails() {
+            document.getElementById('taskDetails').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        function subscribeTask(link) {
+            window.open(link, '_blank');
+        }
+
+        function completeTask() {
+            const taskId = document.getElementById('taskCheckButton').getAttribute('data-task-id');
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            console.log('Completing task:', taskId, 'for user:', userId); // Debug log
+            fetch(`${CONFIG.BASE_URL}complete_task.php?telegram_id=${userId}&task_id=${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Complete task response:', data); // Debug log
+                    if (data.success) {
+                        alert('Task completed! Reward added to your balance.');
+                        fetchTasks();
+                        closeTaskDetails();
+                    } else {
+                        alert(data.error);
+                        console.error('Error completing task:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error completing task:', error);
+                });
+        }
+
+        function navigate(page) {
+            window.location.href = `/telegram/${page}`;
+        }
+
+        function updateLastActivity() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}update_last_activity.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('Error updating last activity:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating last activity:', error);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchTasks();
+            Telegram.WebApp.ready();
+            console.log("Telegram WebApp is ready");
+
+            Telegram.WebApp.expand();
+
+            // Setup back button
+            Telegram.WebApp.BackButton.show();
+            console.log("Back button setup complete");
+
+            window.Telegram.WebView.onEvent('back_button_pressed', back_button_pressed);
+            function back_button_pressed() {
+                console.log("Back button pressed");
+                Telegram.WebApp.BackButton.hide();
+                window.location.href = 'index.html';
+            }
+            document.getElementById('taskCheckButton').addEventListener('click', completeTask);
+            setInterval(updateLastActivity, 60000); // Отправка активности каждые 5 секунд
+        });
+    </script>
+</body>
+</html>

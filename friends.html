@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Friends</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #031223;
+            color: white;
+            overflow-y: auto;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: #202225;
+        }
+        .header img {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .header span {
+            font-size: 20px;
+        }
+        .invite-section {
+            text-align: center;
+            margin-top: 20px;
+            width: 90%;
+
+            padding-bottom: 150px;
+        }
+        .invite-title {
+            font-family: var(--font-family);
+            font-weight: 600;
+            font-size: 32px;
+            letter-spacing: 0.02em;
+            color: #fff;
+            margin-top: 27px;
+        }
+        .invite-subtitle {
+            font-family: var(--font-family);
+            font-weight: 400;
+            font-size: 16px;
+            letter-spacing: 0.02em;
+            color: #fff;
+            margin-top: 13px;
+        }
+        .invite-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 27px;
+        }
+        .invite-card img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        
+        .blur-object {
+            filter: blur(30px);
+            border-radius: 100%;
+            background: var(--cyan-grad, linear-gradient(180deg, #2FB8FF -160%, #9EECD9 100%));
+            position: absolute;
+            width: 29px; /* Делаем блюр такого же размера, как и изображение */
+            height: 29px;
+            z-index: 1; /* Задний план */
+        }
+        .invite-card .text {
+            flex-grow: 1;
+        }
+
+        .image-container {
+            position: relative; /* Контейнер для изображения и blur */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .image-container img{
+            width: 68px;
+            height: 65px;
+            z-index: 2;
+        }
+        .invite-card .text h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .invite-card .text p {
+            margin: 0;
+            font-size: 14px;
+            color: #b9bbbe;
+        }
+        .invite-card .text {
+            font-family: var(--font-family);
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.02em;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .bonus-txt {
+            font-weight: 500;
+            color: #fff;
+            margin-left: 5px;
+        }
+        .bonus {
+            font-family: var(--font-family);
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.02em;
+            color: #fcffac;
+            display: flex;
+        }
+        .bonus img {
+            width: 20px;
+            height: 20px;
+        }
+        .more-bonuses-btn {
+            font-family: var(--font-family);
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: 0.02em;
+            background: linear-gradient(90deg, #2fb8ff 0%, #9eecd9 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border: none;
+            margin-top: 20px;
+        }
+        .copy-link-btn {
+            background: #1591a1;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            padding: 16px 20px;
+            font-size: 22px;
+            cursor: pointer;
+            margin: 20px 0;
+            width: 17.5%;
+            text-align: center;
+        }
+        .copy-link-btn svg {
+            fill: #fff;
+        }
+        .friends-list-title {
+            font-family: var(--second-family);
+            font-weight: 400;
+            font-size: 16px;
+            margin-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            letter-spacing: 0.02em;
+            color: #fff;
+        }
+        .wrap {
+            position: relative;
+            display: inline-block;
+            border-radius: 4px;
+            background: linear-gradient(45deg, #2FB8FF, #9EECD9);
+            padding: 1.5px; /* Ширина обводки */
+            box-sizing: border-box;
+            margin-right: 15px;
+        }
+
+        .wrap img {
+            width: 33px;
+            height: 33px;
+            border-radius: 4px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+        .refresh-button {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+
+        }
+        .friends-list {
+            width: 100%;
+            overflow-y: auto;
+            margin-top: 14px;
+
+        }
+        .friend-item {
+            background-color: #282B30;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 12px;
+            background: var(--token, linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)));
+
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            height: 60px;
+            padding: 12px 0px 12px 12px;
+            box-sizing: border-box;
+        }
+        .friend-item .info {
+            flex-grow: 1;
+            text-align: left;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+        }
+        .friend-item .info h4 {
+            font-family: var(--second-family);
+            font-weight: 400;
+            font-size: 16px;
+            letter-spacing: 0.02em;
+            color: #fff;
+        }
+        .friend-item .info p {
+            font-family: var(--second-family);
+            font-weight: 300;
+            font-size: 14px;
+            letter-spacing: 0.02em;
+            color: rgba(255, 255, 255, 0.4);
+            margin-left: 5px;
+        }
+        .friend-item .coins {
+            color: #ffd700;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .bonus-list {
+            width: 100%;
+            margin-top: 20px;
+            display: none;
+            z-index: 10;
+        }
+        .bonus-item {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 12px;
+            padding: 10px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .bonus-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            z-index: 10;
+        }
+        .bonus-item .text {
+            flex-grow: 1;
+        }
+        .bonus-item .text h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        .bonus-item .text p {
+            margin: 0;
+            font-size: 14px;
+            color: #b9bbbe;
+        }
+        .bonus-item .amount {
+            color: #ffd700;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            position: fixed;
+            bottom: 16px;
+            background: var(--token);
+            -webkit-backdrop-filter: blur(5px); /* Префикс для Safari */
+            backdrop-filter: blur(5px);
+            padding: 5px 5px;
+            border-radius: 20px;
+            width: 90%;
+            z-index: 10;
+        }
+        .menu button {
+            background-color: transparent;
+            color: white;
+            border: none;
+            padding: 5px;
+            font-family: 'Geologica', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 15px;
+            width: 20%;
+            text-align: center;
+            cursor: pointer;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+
+        }
+        .container {
+            width: 26px; 
+            height: 26spx; 
+            overflow: visible; 
+            position: relative;
+            margin-bottom: 26px;
+            margin-top: auto;
+        }
+        .container svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -25%);
+            width: 52px; 
+            height: 52px; 
+        }
+        .menu button img {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 5px;
+        }
+        
+
+        /* Animation for invite-friends-btn */
+        .invite-friends-btn {
+            background: #1591a1;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            position: fixed;
+            bottom: 60px;
+            right: 90px;
+            padding: 20px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 20px 0;
+            width: 72%;
+            animation: pulsate 1.5s infinite;
+            overflow-wrap: break-word;
+            font-family: 'Geologica';
+            font-weight: 400;
+            font-size: 16px;
+            color: #FFFFFF;
+            z-index: 10;
+        }
+        .background-blur {
+            z-index: -1; /* Убедитесь, что фон находится позади всего остального контента */
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow: visible;
+            width: 100vw; /* Используем 100vw для ширины всего экрана */
+            height: 100vh; /* Используем 100vh для высоты всего экрана */
+            pointer-events: none; /* Отключает события мыши для фона */
+        }
+        .background-blur2 {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .blur-center {
+            display: flex;
+            justify-content: center; /* Выравнивание по центру по горизонтали */
+            width: 100%;
+        }
+        @keyframes pulsate {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.95);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script src="configJS.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-blur">
+        <div className="blur-center">
+            <svg width="740" height="326" viewBox="0 0 740 326" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_f_68_15)">
+                    <ellipse cx="370" cy="-84" rx="70" ry="110" fill="#21C9E3" />
+                </g>
+                <defs>
+                    <filter id="filter0_f_68_15" x="0" y="-494" width="740" height="820" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                    <feGaussianBlur stdDeviation="150" result="effect1_foregroundBlur_68_15" />
+                    </filter>
+                </defs>
+            </svg>
+        </div>
+    </div>
+    <div class="background-blur">
+        <svg class="background-blur2" width="375" height="400" viewBox="0 0 375 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g filter="url(#filter0_f_1_11)">
+            <ellipse cx="348.754" cy="366.389" rx="73.6571" ry="56.5366" transform="rotate(47.3736 348.754 366.389)" fill="#21C9E3" />
+          </g>
+          <defs>
+            <filter id="filter0_f_1_11" x="-16.199" y="0.0279541" width="729.905" height="732.723" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+              <feGaussianBlur stdDeviation="150" result="effect1_foregroundBlur_1_11" />
+            </filter>
+          </defs>
+        </svg>
+    </div>
+    <div class="invite-section">
+        <div class="invite-title">Invite friends!</div>
+        <div class="invite-subtitle">You and your friend will receive bonuses</div>
+        <div class="invite-card">
+            <div class="image-container">
+                <svg class="blur-object" width="89" height="89" viewBox="0 0 89 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g filter="url(#filter0_f_1_95)">
+                    <circle cx="44.5" cy="44.5" r="14.5" fill="url(#paint0_linear_1_95)" />
+                  </g>
+                  <defs>
+                    <filter id="filter0_f_1_95" x="0" y="0" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                      <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                      <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur_1_95" />
+                    </filter>
+                    <linearGradient id="paint0_linear_1_95" x1="44.5" y1="-16.4" x2="44.5" y2="59" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#2FB8FF" />
+                      <stop offset="1" stop-color="#9EECD9" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <img src="Elements/present.png" alt="Gift">
+            </div>
+            <div class="text">
+                <h3>Invite a friend</h3>
+                <div class="bonus">
+                    <img class="right-image" src="Elements/coin_icon.png" alt="Coins" width="24" height="24">
+                    +5,000
+                    <div class="bonus-txt"> for you and your friend</div>
+                </div>
+            </div>
+        </div>
+        <button class="more-bonuses-btn" onclick="toggleBonuses()">More bonuses</button>
+        <div class="bonus-list" id="bonusList">
+            <!-- Бонусы будут загружены сюда -->
+        </div>
+        <div class="friends-list-title">
+            <span id="friendsTitle">List of your friends (0)</span>
+        </div>
+        <div class="friends-list" id="friendsList">
+            <!-- Друзья будут загружены сюда -->
+        </div>
+        <div class="bonus-list-title" style="margin-top: 20px;">
+            <button class="invite-friends-btn" onclick="inviteFriend()">Invite a Friend</button>
+            <button class="copy-link-btn" onclick="copyReferralLink()">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13.97 1.83331H10.4004C8.78313 1.8333 7.50217 1.83329 6.49966 1.96861C5.46793 2.10788 4.63285 2.40132 3.97429 3.06252C3.31574 3.72373 3.02347 4.56216 2.88476 5.59803C2.74998 6.60456 2.74999 7.89066 2.75 9.51438V14.8654C2.75 16.2479 3.59329 17.4326 4.79157 17.9293C4.7299 17.0956 4.72994 15.9258 4.73 14.9527L4.73 10.4478L4.73 10.3605C4.72993 9.18566 4.72988 8.17338 4.83843 7.36275C4.95476 6.49399 5.2171 5.66124 5.88986 4.98578C6.56261 4.31032 7.39203 4.04693 8.25732 3.93013C9.06471 3.82114 10.0729 3.8212 11.2431 3.82126L11.33 3.82127H13.97L14.0569 3.82126C15.2271 3.8212 16.2331 3.82114 17.0405 3.93013C16.5575 2.70212 15.3648 1.83331 13.97 1.83331Z" fill="white" />
+                  <path d="M6.05009 10.4476C6.05009 7.94862 6.05009 6.69911 6.82333 5.92277C7.59657 5.14642 8.84107 5.14642 11.3301 5.14642H13.9701C16.4591 5.14642 17.7036 5.14642 18.4769 5.92277C19.2501 6.69911 19.2501 7.94862 19.2501 10.4476V14.8653C19.2501 17.3643 19.2501 18.6138 18.4769 19.3902C17.7036 20.1665 16.4591 20.1665 13.9701 20.1665H11.3301C8.84107 20.1665 7.59657 20.1665 6.82333 19.3902C6.05009 18.6138 6.05009 17.3643 6.05009 14.8653V10.4476Z" fill="white" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Меню -->
+    <div class="menu">
+        <button onclick="navigate('index.html')">
+            <svg width="29" height="28" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M3.81408 9.12651C3.20834 10.2331 3.20834 11.5681 3.20834 14.2379V16.0124C3.20834 20.5635 3.20834 22.839 4.57518 24.2528C5.94201 25.6666 8.1419 25.6666 12.5417 25.6666H17.2083C21.6081 25.6666 23.808 25.6666 25.1748 24.2528C26.5417 22.839 26.5417 20.5635 26.5417 16.0124V14.2379C26.5417 11.5681 26.5417 10.2331 25.9359 9.12651C25.3302 8.01989 24.2236 7.33308 22.0103 5.95946L19.677 4.51133C17.3374 3.05932 16.1676 2.33331 14.875 2.33331C13.5824 2.33331 12.4126 3.05932 10.073 4.51133L7.73972 5.95946C5.52645 7.33308 4.41981 8.01989 3.81408 9.12651ZM11.375 20.125C10.8918 20.125 10.5 20.5167 10.5 21C10.5 21.4832 10.8918 21.875 11.375 21.875H18.375C18.8583 21.875 19.25 21.4832 19.25 21C19.25 20.5167 18.8583 20.125 18.375 20.125H11.375Z" fill="white" fill-opacity="0.3" />
+            </svg>
+            Mine
+        </button>
+        <button  onclick="navigate('friends.html')">
+            <div class="container">
+                <svg width="66" height="66" viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity=".6" filter="url(#a)"><path d="M35.292 25.333a5.333 5.333 0 1 1-10.667 0 5.333 5.333 0 0 1 10.667 0" fill="url(#b)"/><path d="M39.292 40.001c0 2.946-4.179 5.334-9.334 5.334S20.625 42.947 20.625 40s4.179-5.333 9.333-5.333c5.155 0 9.334 2.388 9.334 5.333" fill="url(#c)"/><path d="M45.957 40c0 2.21-2.715 4-6.028 4 .976-1.066 1.647-2.406 1.647-3.998s-.672-2.934-1.65-4.001c3.313 0 6.03 1.79 6.03 4" fill="url(#d)"/><path d="M41.957 25.334a4 4 0 0 1-5.372 3.76c.631-1.11.991-2.394.991-3.761s-.36-2.65-.99-3.758a4 4 0 0 1 5.37 3.76" fill="url(#e)"/></g><g filter="url(#f)"><path d="M35.292 25.333a5.333 5.333 0 1 1-10.667 0 5.333 5.333 0 0 1 10.667 0" fill="url(#g)"/><path d="M39.292 40.001c0 2.946-4.179 5.334-9.334 5.334S20.625 42.947 20.625 40s4.179-5.333 9.333-5.333c5.155 0 9.334 2.388 9.334 5.333" fill="url(#h)"/><path d="M45.957 40c0 2.21-2.715 4-6.028 4 .976-1.066 1.647-2.406 1.647-3.998s-.672-2.934-1.65-4.001c3.313 0 6.03 1.79 6.03 4" fill="url(#i)"/><path d="M41.957 25.334a4 4 0 0 1-5.372 3.76c.631-1.11.991-2.394.991-3.761s-.36-2.65-.99-3.758a4 4 0 0 1 5.37 3.76" fill="url(#j)"/></g><path d="M35.292 25.333a5.333 5.333 0 1 1-10.667 0 5.333 5.333 0 0 1 10.667 0" fill="url(#k)"/><path d="M39.292 40.001c0 2.946-4.179 5.334-9.334 5.334S20.625 42.947 20.625 40s4.179-5.333 9.333-5.333c5.155 0 9.334 2.388 9.334 5.333" fill="url(#l)"/><path d="M45.957 40c0 2.21-2.715 4-6.028 4 .976-1.066 1.647-2.406 1.647-3.998s-.672-2.934-1.65-4.001c3.313 0 6.03 1.79 6.03 4" fill="url(#m)"/><path d="M41.957 25.334a4 4 0 0 1-5.372 3.76c.631-1.11.991-2.394.991-3.761s-.36-2.65-.99-3.758a4 4 0 0 1 5.37 3.76" fill="url(#n)"/><defs><linearGradient id="b" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="c" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="d" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="e" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="g" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="h" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="i" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="j" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="k" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="l" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="m" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><linearGradient id="n" x1="33.291" y1="20" x2="33.291" y2="45.335" gradientUnits="userSpaceOnUse"><stop stop-color="#2FB8FF"/><stop offset="1" stop-color="#9EECD9"/></linearGradient><filter id="a" x=".625" y="0" width="65.332" height="65.335" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="10" result="effect1_foregroundBlur_1_163"/></filter><filter id="f" x="16.625" y="16" width="33.331" height="33.335" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur_1_163"/></filter></defs></svg>
+            </div>
+            Friends
+        </button>
+        <button onclick="navigate('earn.html')">
+            <img src="Elements/Menu/earn_icon.png" alt="Earn">
+            Earn
+        </button>
+        <button onclick="navigate('earn.html')">
+            <img src="Elements/Menu/cards_icon.svg" alt="Cards">
+            Cards
+        </button>
+        <button onclick="navigate('wallet.html')">
+            <img src="Elements/Menu/wallet_icon.svg" alt="Wallet">
+            Wallet
+        </button>
+    </div>
+
+    <script>
+        //eruda.init();
+        Telegram.WebApp.ready();
+
+        let referralLink = '';
+
+        function navigate(page) {
+            window.location.href = `/telegram/${page}`;
+        }
+
+        function inviteFriend() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}referral.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const referralLink = `https://t.me/Testtestclickerclickerbot/start?startapp=${data.referral_code}`;
+                        const shareLink = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent("Join me in this amazing game!")}`;
+                        Telegram.WebApp.openTelegramLink(shareLink);
+                    } else {
+                        console.error('Error generating referral code:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error generating referral code:', error);
+                });
+        }
+
+        function fetchReferralLink(userId) {
+            const url = `${CONFIG.BASE_URL}referral.php?telegram_id=${userId}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response data:', data);
+                    if (data.success) {
+                        referralLink = `https://t.me/Testtestclickerclickerbot/start?startapp=${data.referral_code}`;
+                        console.log('Referral Link:', referralLink);
+                    } else {
+                        console.error('Error generating referral code:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error generating referral code:', error);
+                });
+        }
+
+        // Функция для копирования реферальной ссылки
+        function copyReferralLink() {
+            if (referralLink) {
+                navigator.clipboard.writeText(referralLink).then(() => {
+                    alert('Referral link copied to clipboard!');
+                }).catch(err => {
+                    console.error('Could not copy text: ', err);
+                });
+            } else {
+                alert('Referral link is not available. Please try again later.');
+            }
+        }
+
+        function loadFriends() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}get_friends.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const friendsList = document.getElementById('friendsList');
+                        friendsList.innerHTML = '';
+                        data.friends.forEach(friend => {
+                            const friendItem = document.createElement('div');
+                            friendItem.className = 'friend-item';
+                            friendItem.innerHTML = `
+                                <div class="wrap">
+                                    <img src="${friend.profile_img_url || 'default_profile_img.png'}" alt="Friend">
+                                </div>
+                                <div class="info">
+                                    <h4>${friend.full_name}</h4>
+                                    <p>● ${friend.league}</p>
+                                </div>
+                            `;
+                            friendsList.appendChild(friendItem);
+                        });
+                        document.getElementById('friendsTitle').innerText = `List of your friends (${data.friends.length})`;
+                    } else {
+                        console.error('Error fetching friends:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching friends:', error);
+                });
+        }
+
+        function toggleBonuses() {
+            const bonusList = document.getElementById('bonusList');
+            if (bonusList.style.display === 'none' || bonusList.style.display === '') {
+                bonusList.style.display = 'block';
+                loadBonuses();
+            } else {
+                bonusList.style.display = 'none';
+            }
+        }
+
+        function loadBonuses() {
+            const bonusList = document.getElementById('bonusList');
+            bonusList.innerHTML = `
+                <div class="bonus-item">
+                    <div class="image-container">
+                        <svg class="blur-object" width="89" height="89" viewBox="0 0 89 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g filter="url(#filter0_f_1_95)">
+                            <circle cx="44.5" cy="44.5" r="14.5" fill="url(#paint0_linear_1_95)" />
+                          </g>
+                          <defs>
+                            <filter id="filter0_f_1_95" x="0" y="0" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                              <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur_1_95" />
+                            </filter>
+                            <linearGradient id="paint0_linear_1_95" x1="44.5" y1="-16.4" x2="44.5" y2="59" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#2FB8FF" />
+                              <stop offset="1" stop-color="#9EECD9" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <img src="Elements/present.png" alt="Gift">
+                    </div>
+                    <div class="text">
+                        <h3>Silver</h3>
+                        <p>For friend: +20,000</p>
+                        <p>Premium: +25,000</p>
+                    </div>
+                </div>
+                <div class="bonus-item">
+                    <div class="image-container">
+                        <svg class="blur-object" width="89" height="89" viewBox="0 0 89 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g filter="url(#filter0_f_1_95)">
+                            <circle cx="44.5" cy="44.5" r="14.5" fill="url(#paint0_linear_1_95)" />
+                          </g>
+                          <defs>
+                            <filter id="filter0_f_1_95" x="0" y="0" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                              <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur_1_95" />
+                            </filter>
+                            <linearGradient id="paint0_linear_1_95" x1="44.5" y1="-16.4" x2="44.5" y2="59" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#2FB8FF" />
+                              <stop offset="1" stop-color="#9EECD9" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <img src="Elements/present.png" alt="Gift">
+                    </div>
+                    <div class="text">
+                        <h3>Gold</h3>
+                        <p>For friend: +30,000</p>
+                        <p>Premium: +50,000</p>
+                    </div>
+                </div>
+                <div class="bonus-item">
+                    <div class="image-container">
+                        <svg class="blur-object" width="89" height="89" viewBox="0 0 89 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g filter="url(#filter0_f_1_95)">
+                            <circle cx="44.5" cy="44.5" r="14.5" fill="url(#paint0_linear_1_95)" />
+                          </g>
+                          <defs>
+                            <filter id="filter0_f_1_95" x="0" y="0" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                              <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur_1_95" />
+                            </filter>
+                            <linearGradient id="paint0_linear_1_95" x1="44.5" y1="-16.4" x2="44.5" y2="59" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#2FB8FF" />
+                              <stop offset="1" stop-color="#9EECD9" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <img src="Elements/present.png" alt="Gift">
+                    </div>
+                    <div class="text">
+                        <h3>Platinum</h3>
+                        <p>For friend: +50,000</p>
+                        <p>Premium: +75,000</p>
+                    </div>
+                </div>
+                <div class="bonus-item">
+                    <div class="image-container">
+                        <svg class="blur-object" width="89" height="89" viewBox="0 0 89 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g filter="url(#filter0_f_1_95)">
+                            <circle cx="44.5" cy="44.5" r="14.5" fill="url(#paint0_linear_1_95)" />
+                          </g>
+                          <defs>
+                            <filter id="filter0_f_1_95" x="0" y="0" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                              <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur_1_95" />
+                            </filter>
+                            <linearGradient id="paint0_linear_1_95" x1="44.5" y1="-16.4" x2="44.5" y2="59" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#2FB8FF" />
+                              <stop offset="1" stop-color="#9EECD9" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <img src="Elements/present.png" alt="Gift">
+                    </div>
+                    <div class="text">
+                        <h3>Diamond</h3>
+                        <p>For friend: +100,000</p>
+                        <p>Premium: +150,000</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateLastActivity() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}update_last_activity.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('Error updating last activity:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating last activity:', error);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFriends();
+            const userId1 = Telegram.WebApp.initDataUnsafe.user.id;
+            console.log('User ID:', userId1);
+            fetchReferralLink(userId1);
+            Telegram.WebApp.ready();
+            console.log("Telegram WebApp is ready");
+
+            Telegram.WebApp.expand();
+
+            // Setup back button
+            Telegram.WebApp.BackButton.show();
+            console.log("Back button setup complete");
+
+            window.Telegram.WebView.onEvent('back_button_pressed', back_button_pressed);
+            function back_button_pressed() {
+                console.log("Back button pressed");
+                Telegram.WebApp.BackButton.hide();
+                window.location.href = 'index.html';
+            }
+            setInterval(updateLastActivity, 60000); // Отправка активности каждые 5 секунд
+        });
+    </script>
+</body>
+</html>

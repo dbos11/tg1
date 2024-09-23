@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Boosts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000000;
+            color: white;
+            overflow: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .balance-container1 {
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #000000;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        .balance-container {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .balance-container span{
+            font-size: 28px;
+            color: #FFD700; /* Gold color */
+            font-weight: bold;
+        }
+        .balance-container img{
+            width: 40px;
+            height: 40px;
+            margin-right: 5px;
+        }
+        .boost-container {
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #000000;
+            border-radius: 25px;
+            margin-bottom: 10px;
+        }
+        .boost-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #282B30;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+        .disabled {
+            opacity: 0.5; /* Пример: устанавливает полупрозрачность контейнера */
+            pointer-events: none; /* Чтобы отключить возможность взаимодействия с содержимым, если нужно */
+        }
+        .boost-item span {
+            font-size: 16px;
+        }
+        .boost-item img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .boost-button {
+            background-color: #282B30;
+            border: none;
+            color: white;
+            padding: 10px 0px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+
+        }
+        .boost-button img{
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            padding-top: 5px;
+        }
+        .boost-button[disabled] {
+            background-color: none;
+            cursor: not-allowed;
+        }
+        .boost-item .content {
+            display: flex;
+            align-items: center;
+        }
+        .stats {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+        .stats span {
+            font-size: 16px;
+            color: #FFFFFF; /* Gold color */
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .stats span2 {
+            font-size: 14px;
+            color: #FFD700; /* Gold color */
+            margin-right: 5px;
+            
+        }
+        .stats img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        boost-item.details {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #2c2f33;
+            color: white;
+            padding: 20px;
+            border-radius: 25px 25px 0 0;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 2;
+            text-align: center;
+            box-shadow: 0 0 10px 2px #ff9900; /* Glowing border */
+        }
+        .details {
+            flex-grow: 1;
+            padding-left: 10px;
+        }
+        .task-details {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #2c2f33;
+            color: white;
+            padding: 20px;
+            border-radius: 25px 25px 0 0;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 2;
+            text-align: center;
+            
+        }
+        .task-details.active {
+            transform: translateY(0);
+            box-shadow: 0 0 10px 2px #ff9900; /* Glowing border */
+        }
+        .task-details img {
+            max-width: 100px; /* Adjust the size of the image as needed */
+            margin-bottom: 10px;
+            border-radius: 15px;
+        }
+        .task-details .task-name {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+            margin-bottom: 10px;
+        }
+        .task-details .task-description {
+            font-size: 14px;
+            font-family: Helvetica, Arial, sans-serif;
+            margin-bottom: 20px;
+        }
+        .task-details .task-reward {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 28px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .task-details .task-reward span1{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 0;
+            font-size: 28px;;
+            font-family: Helvetica, Arial, sans-serif;
+            font-weight: bold;
+        }
+        .task-details .task-reward span2{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 0;
+            font-size: 24px;
+            font-family: Helvetica, Arial, sans-serif;
+            margin-left: 5px;
+        }
+        .task-details .task-reward img {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+            padding-top: 10px;
+        }
+        .task-details .task-button {
+            background-color: #ff7e5f;
+            border: none;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .task-details .task-button1 {
+            background-color: #ff7e5f;
+            border: none;
+            color: white;
+            padding: 25px 140px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 15px 0;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .task-details .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            display: none;
+        }
+        .overlay.active {
+            display: block;
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script src="configJS.js"></script>
+</head>
+<body>
+    <div class="balance-container">
+        <img src="Elements/coin_icon.svg" alt="Coin Icon">
+        <span id="balance">0</span>
+    </div>
+    <div class="boost-container" id="boostContainer">
+        <!-- Boosts will be dynamically added here -->
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="task-details" id="taskDetails">
+        <button class="close-button" onclick="closeBoostDetails()">✖</button>
+        <img id="taskDetailsImage" src="" alt="Task Image">
+        <div class="task-name" id="taskDetailsName"></div>
+        <div class="task-description" id="taskDetailsDescription"></div>
+        <div class="task-description" id="taskDetailsDescription2"></div>
+        <div class="task-reward">
+            <img src="Elements/coin_icon.svg" alt="Reward">
+            <span id="taskDetailsReward"></span>
+            <span2 id="taskDetailsReward2"></span2>
+        </div>
+        <button class="task-button" id="taskSubscribeButton">Upgrade</button>
+    </div>
+
+
+
+    <script>
+        eruda.init();
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+
+        let balance = 0;
+        let pendingCoins = 0;
+
+        function fetchBoosts() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            console.log("Fetching boosts for user ID:", userId);
+        
+            // Извлечение данных из session storage
+            const balance = parseInt(sessionStorage.getItem('balance'));
+            const dailyFullEnergyCount = parseInt(sessionStorage.getItem('daily_full_energy_count'));
+            const dailyTurboCount = parseInt(sessionStorage.getItem('daily_turbo_count'));
+            const damageLevel = parseInt(sessionStorage.getItem('damage_amount'));
+            const energyLevel = parseInt(sessionStorage.getItem('energy_level'));
+            const energyRecoveryLevel = parseInt(sessionStorage.getItem('energy_recovery_level'));
+            const miningBotStatus = parseInt(sessionStorage.getItem('mining_bot_status'));
+        
+            // Обновление UI
+            document.getElementById('balance').innerText = balance;
+        
+            const boostContainer = document.getElementById('boostContainer');
+            boostContainer.innerHTML = `
+                <div class="balance-container1">
+                    <span>Free daily boosters</span>
+                </div>
+        
+                <div class="boost-item">
+                    <img src="hand_icon.png" alt="Tap Icon">
+                    <div class="details">
+                        <div class="title">Full Energy</div>
+                        <div class="stats">
+                            <span>${dailyFullEnergyCount}/3 available</span>
+                        </div>
+                    </div>
+                    <button class="boost-button" onclick="useBoost('fullEnergy')"><img src="Elements/arrow.png" alt="Details"></button>
+                </div>
+        
+                <div class="boost-item">
+                    <img src="hand_icon.png" alt="Tap Icon">
+                    <div class="details">
+                        <div class="title">Turbo</div>
+                        <div class="stats">
+                            <span>${dailyTurboCount}/3 available</span>
+                        </div>
+                    </div>
+                    <button class="boost-button" onclick="useBoost('turbo')"><img src="Elements/arrow.png" alt="Details"></button>
+                </div>
+        
+                <div class="balance-container1">
+                    <span>Boosters</span>
+                </div>
+        
+                <div class="boost-item">
+                    <img src="hand_icon.png" alt="Tap Icon">
+                    <div class="details">
+                        <div class="title">Multitap</div>
+                        <div class="stats">
+                            <img src="Elements/coin_icon.svg" alt="Coin Icon">
+                            <span>${calculateCost(damageLevel)}</span>
+                            <span2>● ${damageLevel} lvl</span2>
+                        </div>
+                    </div>
+                    <button class="boost-button" id="damageButton" onclick="openBoostDetails('Multitap', 'Multitap', '+1 for level ${damageLevel}', 'Elements/coin_icon.svg', 'damage', ${damageLevel}, ${calculateCost(damageLevel)})"><img src="Elements/arrow.png" alt="Details"></button>
+                </div>
+        
+                <div class="boost-item">
+                    <img src="hand_icon.png" alt="Tap Icon">
+                    <div class="details">
+                        <div class="title">Energy</div>
+                        <div class="stats">
+                            <img src="Elements/coin_icon.svg" alt="Coin Icon">
+                            <span>${calculateCost(energyLevel)}</span>
+                            <span2>● ${energyLevel} lvl</span2>
+                        </div>
+                    </div>
+                    <button class="boost-button" id="damageButton" onclick="openBoostDetails('Energy Limit', 'Energy Limit', '+500 Energy for level ${energyLevel}', 'Elements/coin_icon.svg', 'energy', ${energyLevel}, ${calculateCost(energyLevel)})"><img src="Elements/arrow.png" alt="Details"></button>
+                </div>
+        
+                <div class="boost-item ${energyRecoveryLevel >= 5 ? 'disabled' : ''}">
+                    <img src="hand_icon.png" alt="Tap Icon">
+                    <div class="details">
+                        <div class="title">Energy Recovery</div>
+                        <div class="stats">
+                            ${energyRecoveryLevel < 5 ? '<img src="Elements/coin_icon.svg" alt="Coin Icon">' : ''}
+                            ${energyRecoveryLevel < 5 ? `<span>${calculateCost(energyRecoveryLevel)}</span>` : ''}
+                            ${energyRecoveryLevel < 5 ? '<span2>●</span2>' : ''}
+                            <span2>${energyRecoveryLevel >= 5 ? 'Max' : energyRecoveryLevel} lvl</span2>
+                        </div>
+                    </div>
+                    <button class="boost-button" id="energyRecoveryButton" ${energyRecoveryLevel >= 5 ? 'disabled' : ''} onclick="openBoostDetails('Energy Limit', 'Energy Limit', '+500 Energy for level ${energyRecoveryLevel}', 'Elements/coin_icon.svg', 'energy_recovery', ${energyRecoveryLevel}, ${calculateCost(energyRecoveryLevel)})"><img src="Elements/arrow.png" alt="Details"></button>
+                </div>
+        
+                <div class="boost-item ${miningBotStatus == '1' ? 'disabled' : ''}" id="mining_bot">
+                    <img src="hand_icon.png" alt="Tap Icon">
+                    <div class="details">
+                        <div class="title">Mining Bot</div>
+                        <div class="stats">
+                            ${miningBotStatus == '0' ? '<img src="Elements/coin_icon.svg" alt="Coin Icon">' : ''}
+                            ${miningBotStatus == '0' ? '<span>200</span>' : ''}
+                            <span2>${miningBotStatus ? 'Active' : 'Locked'}</span2>
+                        </div>
+                    </div>
+                    <button class="boost-button" id="miningBotButton" ${miningBotStatus ? 'disabled' : ''} onclick="buyMiningBot()"><img src="Elements/arrow.png" alt="Details"></button>
+                </div>
+            `;
+        }
+
+
+        function openBoostDetails(taskName, taskDescription, taskDescription2, taskPicture, boostType, currentLevel, UpgradePrice) {
+            //console.log('Opening task details:', taskId, taskName, taskDescription, taskReward, taskLink, taskImageUrl); // Debug log
+            document.getElementById('taskDetailsName').innerText = taskName;
+            document.getElementById('taskDetailsDescription').innerText = taskDescription;
+            document.getElementById('taskDetailsDescription2').innerText = taskDescription2;
+            document.getElementById('taskDetailsReward').innerText = `${UpgradePrice}`;
+            document.getElementById('taskDetailsReward2').innerText =`● ${currentLevel} lvl`;
+            document.getElementById('taskSubscribeButton').onclick = () => upgradeBoost(boostType, currentLevel);
+            //document.getElementById('taskCheckButton').setAttribute('data-task-id', taskId);
+            document.getElementById('taskDetailsImage').src = taskPicture;
+
+            document.getElementById('taskDetails').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closeBoostDetails() {
+            document.getElementById('taskDetails').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        function calculateCost(level) {
+            return 10 * Math.pow(2, level);
+        }
+
+        function upgradeBoost(boostType, currentLevel) {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            const cost = calculateCost(currentLevel);
+        
+            let balance = parseInt(sessionStorage.getItem('balance')) || 0;
+        
+            if (balance >= cost) {
+                fetch(`${CONFIG.BASE_URL}upgrade_boost.php?telegram_id=${userId}&boost_type=${boostType}&cost=${cost}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Boost upgrade response:", data);
+        
+                        if (data.success) {
+                            balance -= cost;
+                            sessionStorage.setItem('balance', balance);
+        
+                            // Update the specific boost level in sessionStorage
+                            let newLevel = currentLevel + 1;
+                            if (boostType === 'damage') {
+                                sessionStorage.setItem('damage_amount', newLevel);
+                            } else if (boostType === 'energy') {
+                                sessionStorage.setItem('energy_level', newLevel);
+                            } else if (boostType === 'energy_recovery') {
+                                sessionStorage.setItem('energy_recovery_level', newLevel);
+                            }
+        
+                            fetchBoosts(); // Refresh boosts after upgrading
+                            alert('Boost upgraded successfully!');
+                            closeBoostDetails();
+                        } else {
+                            alert(data.error);
+                            console.error('Error upgrading boost:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error upgrading boost:', error);
+                    });
+            } else {
+                alert('Not enough coins!');
+            }
+        }
+        
+        
+        function buyMiningBot() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            const cost = 200;
+        
+            let balance = parseInt(sessionStorage.getItem('balance')) || 0;
+        
+            if (balance >= cost) {
+                fetch(`${CONFIG.BASE_URL}buy_mining_bot.php?telegram_id=${userId}&cost=${cost}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Mining bot purchase response:", data);
+        
+                        if (data.success) {
+                            balance -= cost;
+                            sessionStorage.setItem('balance', balance);
+        
+                            fetchBoosts(); // Refresh boosts after purchase
+                            alert('Mining bot purchased successfully!');
+                            document.getElementById('mining_bot').classList.add('disabled');
+                            document.getElementById('miningBotButton').setAttribute('disabled', 'true');
+                        } else {
+                            alert(data.error);
+                            console.error('Error purchasing mining bot:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error purchasing mining bot:', error);
+                    });
+            } else {
+                alert('Not enough coins!');
+            }
+        }
+
+
+        function useBoost(boostType) {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            console.log(`Using boost type: ${boostType} for user ID:`, userId);
+        
+            fetch(`${CONFIG.BASE_URL}use_boost.php?telegram_id=${userId}&boost_type=${boostType}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Boost use response:", data);
+        
+                    if (data.success) {
+                        if (boostType === 'turbo') {
+                            // Устанавливаем multiplier и turbo_end_time в session storage
+                            const multiplier = 10; // Пример значения множителя
+                            const turboDuration = 15 * 1000; // Длительность турбо в миллисекундах (15 секунд)
+                            const turboEndTime = Math.floor(Date.now() / 1000) + (turboDuration / 1000); // Записываем время окончания в секундах
+        
+                            sessionStorage.setItem('multiplier', multiplier);
+                            sessionStorage.setItem('turbo_end_time', turboEndTime);
+        
+                            alert('Turbo boost activated!');
+                        }
+        
+                        fetchBoosts(); // Refresh boosts after using
+                        openMainPage();
+                    } else {
+                        alert(data.error);
+                        console.error('Error using boost:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error using boost:', error);
+                });
+        }
+
+
+        function openMainPage() {
+            window.location.href = 'index.html';
+        }
+
+        function updateLastActivity() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}update_last_activity.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('Error updating last activity:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating last activity:', error);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchBoosts();
+            Telegram.WebApp.ready();
+            console.log("Telegram WebApp is ready");
+
+            Telegram.WebApp.expand();
+
+            // Setup back button
+            Telegram.WebApp.BackButton.show();
+            console.log("Back button setup complete");
+
+            window.Telegram.WebView.onEvent('back_button_pressed', back_button_pressed);
+            function back_button_pressed() {
+                console.log("Back button pressed");
+                if (window.history.length > 1) {
+                    window.history.back();
+                    Telegram.WebApp.BackButton.hide();
+                } else {
+                    // If no history, close the web view
+                    Telegram.WebApp.close();
+                }
+            }
+            setInterval(updateLastActivity, 60000); // Отправка активности каждые 5 секунд
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Telegram Mini App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #031223;
+            color: white;
+            overflow: hidden;
+            overflow-y: auto;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #2c2f33;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it is on top */
+        }
+
+        .spinner {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .box {
+            backdrop-filter: blur(4px);
+            border-radius: 12px;
+            background: var(--token);
+            position: relative;
+            margin: 16px 16px 24px 16px;
+            display: flex;
+            padding: 12px 12px 12px 12px;
+            width: calc(100% - 32px);
+            box-sizing: border-box;
+            overflow: hidden;
+            -webkit-backdrop-filter: blur(4px); /* Префикс для Safari */
+        }
+        .box .objects {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            height: fit-content;
+            box-sizing: border-box;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            text-align: center;
+        }
+
+        .wrap {
+            position: relative;
+            display: inline-block;
+            border-radius: 4px;
+            background: linear-gradient(45deg, #2FB8FF, #9EECD9);
+            padding: 1.5px; /* Ширина обводки */
+            box-sizing: border-box;
+            margin-right: 15px;
+        }
+
+        .wrap img {
+            width: 33px;
+            height: 33px;
+            border-radius: 4px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-profile span {
+            font-size: 16px;
+            font-family: var(--second-family);
+            margin-right: 5px;
+        }
+        .box .right-image {
+            position: absolute; /* Устанавливаем абсолютное позиционирование для изображений */
+            top: -10%; /* Позиционируем по вертикали в центр */
+            transform: translateY(-50%); /* Центрируем по вертикали */
+            transform: rotate(-18.304deg);
+            margin-bottom: 40.7px;
+            right: -22px;
+            top: -22px;
+            width: 61.2px;
+            height: 61.2px;
+        }
+        .balance-container {
+            text-align: center;
+        }
+        .league-and-coins-per-hour{
+            margin-right: 2.5px;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            width: calc(100% - 2.5px);
+            box-sizing: border-box;
+        }
+
+        .league-and-coins-per-hour .leagues{
+            margin-top: 5px;
+            width: 224px;
+            flex-direction: column;
+        }
+        .coins-per-hour {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            margin-top: auto;
+        }
+        .coins-per-hour .txt{
+            font-family: var(--second-family);
+            font-weight: 400;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .coins-per-hour .coins{
+            font-family: var(--second-family);
+            font-weight: 400;
+            font-size: 15px;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+         .coins img{
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        .text {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start; /* Для вертикального выравнивания элементов */
+            width: 95%;
+            margin-top: 10px;
+        }
+
+        .text .txt {
+            font-family: var(--second-family);
+            font-weight: 400;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .text .next-lvl {
+            font-family: var(--second-family);
+            font-weight: 400;
+            font-size: 14px;
+            color: #fff;
+            margin-left: auto; /* Это должно отправить элемент вправо */
+        }
+        
+        .text .arrow {
+            stroke-width: 1.50px;
+            stroke: #fff;
+            margin-left: 5px;
+            margin-top: 2px;
+        }
+
+        .balance {
+            font-family: var(--second-family);
+            font-weight: 400;
+            font-size: 36px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .balance img {
+            width: 50px;
+            height: 5s0px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        .league-container {
+            text-align: left;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 360px;
+
+        }
+        .league {
+            overflow-wrap: break-word;
+            font-family: 'Geologica';
+            font-weight: 300;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-right: 5px;
+        }
+        .leagues {
+            display: flex;
+            align-items: center;
+        }
+        .leagues img{
+            width: 10px;
+            height: 10px;
+            margin-left: 5px;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 17px; /* Высота прогресс-бара соответствует высоте SVG */
+            overflow: hidden;
+            margin-top: 10px;
+            margin-left: 0px;
+            position: relative;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        #progress-fill,
+        #progress-glow {
+            transition: width 0.1s ease-in-out;
+        }
+
+
+        .progress-bronze {
+            background: linear-gradient(90deg, #cd7f32 0%, #e6a163 100%) !important;
+        }
+        .progress-silver {
+            background: linear-gradient(90deg, #c0c0c0 0%, #d9d9d9 100%) !important;
+        }
+        .progress-gold {
+            background: linear-gradient(90deg, #ffd700 0%, #ffeb7a 100%) !important;
+        }
+        .progress-platinum {
+            background: linear-gradient(90deg, #e5e4e2 0%, #f5f5f5 100%) !important;
+        }
+        .progress-diamond {
+            background: linear-gradient(90deg, #61E1FF 0%, #e3f7ff 100%) !important;
+        }
+
+        .hamster-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 348px;
+            height: 348px;
+            margin-top: 20px;
+            background-color: transparent;
+            cursor: pointer;
+            border: none;
+            position: relative;
+            overflow: visible;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hamster-container img {
+            width: 80px;
+            height: 257px;
+        }
+        .energy-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            height: 20px;
+            overflow: visible;
+            z-index: 1;
+        }
+        .energy {
+            display: flex;
+            align-items: center;
+            overflow-wrap: break-word;
+            font-family: var(--second-family);
+            font-weight: 400;
+            font-size: 16px;
+            color: #FFFFFF;
+            margin-bottom: -36px;
+        }
+        .energy img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        .boost-button {
+            background-color: transparent;
+            color: white;
+            flex-direction: column;
+            cursor: pointer;
+            font-family: var(--second-family);
+            font-weight: 400;
+            font-size: 16px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            padding: 0; 
+            outline: none; 
+            border: none;
+            margin-bottom: 16px;
+        }
+        .boost-button img {
+            border-radius: 100px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            display: flex;
+            padding: 12.6px 16.7px;
+            width: 52px;
+            height: 52px;
+            box-sizing: border-box;
+            margin-bottom: 4px;
+        }
+        .damage {
+            position: absolute;
+            font-family: var(--second-family);
+            font-weight: 600;
+            font-size: 28px;
+            color: #fff;
+            animation: floatUp 0.5s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px);
+            }
+        }
+        .reward-details {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #2c2f33;
+            color: white;
+            padding: 20px;
+            border-radius: 25px 25px 0 0;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 2;
+            text-align: center;
+            
+        }
+        .reward-details.active {
+            transform: translateY(0);
+            box-shadow: 0 0 10px 2px #ff9900; /* Glowing border */
+        }
+        .reward-details .reward-amount {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+            margin-bottom: 10px;
+        }
+        .reward-details .reward-description {
+            font-size: 14px;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .reward-details .reward-button {
+            background-color: #ff7e5f;
+            border: none;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .reward-details .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            display: none;
+        }
+        .overlay.active {
+            display: block;
+        }
+        .balance-increase {
+            transition: transform 0.5s ease-in-out;
+        }
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            position: fixed;
+            bottom: 16px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            -webkit-backdrop-filter: blur(10px); /* Префикс для Safari */
+            backdrop-filter: blur(10px);
+            padding: 5px 5px;
+            border-radius: 20px;
+            width: 90%;
+        }
+        .menu button {
+            background-color: transparent;
+            color: white;
+            border: none;
+            padding: 5px;
+            font-family: 'Geologica', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 15px;
+            width: 20%;
+            text-align: center;
+            cursor: pointer;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .menu button img {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 5px;
+        }
+        .menu button.active {
+            background-color: none;
+            border-radius: 20px;
+        }
+        .menu button.active img{
+            background-color: none;
+            border-radius: 20px;
+            width: 64px;
+            height: 64px;
+            margin-bottom: -15px;
+            margin-top: -20px;
+        }
+        .overlay2 {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            z-index: 1000;
+        }
+        .overlay2-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .background-blur {
+            z-index: -1; /* Убедитесь, что фон находится позади всего остального контента */
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow: visible;
+            width: 100vw; /* Используем 100vw для ширины всего экрана */
+            height: 100vh; /* Используем 100vh для высоты всего экрана */
+            pointer-events: none; /* Отключает события мыши для фона */
+        }
+        .background-blur2 {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        #balance {
+            transition: all 0.5s ease-out;
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script src="configJS.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="overlay2" class="overlay2">
+        <div class="overlay-content">
+            Игра с компьютера не поддерживается. Пожалуйста, используйте мобильное устройство.
+        </div>
+    </div>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner"></div>
+    </div>
+    <div class="background-blur">
+        <svg width="375" height="326" viewBox="0 0 375 326" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g filter="url(#filter0_f_1_91)">
+            <ellipse cx="187" cy="-84" rx="70" ry="110" fill="#21C9E3" />
+          </g>
+          <defs>
+            <filter id="filter0_f_1_91" x="-183" y="-494" width="740" height="820" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+              <feGaussianBlur stdDeviation="150" result="effect1_foregroundBlur_1_91" />
+            </filter>
+          </defs>
+        </svg>
+    </div>
+    <div class="background-blur">
+        <svg class="background-blur2" width="375" height="400" viewBox="0 0 375 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g filter="url(#filter0_f_1_11)">
+            <ellipse cx="348.754" cy="366.389" rx="73.6571" ry="56.5366" transform="rotate(47.3736 348.754 366.389)" fill="#21C9E3" />
+          </g>
+          <defs>
+            <filter id="filter0_f_1_11" x="-16.199" y="0.0279541" width="729.905" height="732.723" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+              <feGaussianBlur stdDeviation="150" result="effect1_foregroundBlur_1_11" />
+            </filter>
+          </defs>
+        </svg>
+    </div>
+
+     <div class="box">
+        <div class="objects">
+            <div class="user-profile">
+                <div class="wrap">
+                    <img src="default_profile_img.png" alt="User Icon" id="profileImg">
+                </div>
+                <span id="username">Имя пользователя</span>
+                <div class="league">
+                    ●  
+                </div>
+                <div class="league" id="league">
+                    Bronze 
+                </div>
+            </div>
+            <img class="right-image" src="Elements/coin_icon.png" alt="Coins" width="24" height="24">
+            <div class="league-and-coins-per-hour">
+                <div class="leagues" onclick="openLeagueMenu()">
+                    <div class="text">
+                        <div class="txt">Next lvl</div>
+                        <div class="next-lvl">1/10M</div>
+                        <svg class="arrow" width="6" height="12" viewBox="0 0 6 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 1.33334L5 6.00001L1 10.6667" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="progress-bar-container">
+                        <svg class="progress-bar" width="236" height="17" viewBox="0 0 236 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="clip-path">
+                            <path d="M6 9.47214V14C6 15.1046 6.89543 16 8 16H227.5C228.605 16 229.5 15.1046 229.5 14V9.47214C229.5 9.16165 229.428 8.85542 229.289 8.57771L226.053 2.10557C225.714 1.428 225.021 1 224.264 1H11.2361C10.4785 1 9.786 1.428 9.44721 2.10557L6.21115 8.57771C6.07229 8.85542 6 9.16165        6 9.47214Z" />
+                                </clipPath>
+                                <!-- Градиенты -->
+                                <linearGradient id="bronze-gradient" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#cd7f32" />
+                                    <stop offset="100%" stop-color="#a66a2c" />
+                                </linearGradient>
+                                <linearGradient id="silver-gradient" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#c0c0c0" />
+                                    <stop offset="100%" stop-color="#a9a9a9" />
+                                </linearGradient>
+                                <linearGradient id="gold-gradient" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#ffd700" />
+                                    <stop offset="100%" stop-color="#ffb700" />
+                                </linearGradient>
+                                <linearGradient id="platinum-gradient" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#e5e4e2" />
+                                    <stop offset="100%" stop-color="#d1d1d1" />
+                                </linearGradient>
+                                <linearGradient id="diamond-gradient" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#b9f2ff" />
+                                    <stop offset="100%" stop-color="#89cff0" />
+                                </linearGradient>
+                                <!-- Фильтр -->
+                                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feDropShadow dx="0" dy="-5" stdDeviation="5" flood-color="white" flood-opacity="0.8"/>
+                                </filter>
+                            </defs>
+                            <g filter="url(#filter0_bi_1_46)">
+                                <rect id="progress-fill" x="6" y="1" width="0" height="15" fill="url(#bronze-gradient)" clip-path="url(#clip-path)" />
+                                <rect id="progress-glow" x="6" y="1" width="0" height="15" fill="url(#bronze-gradient)" clip-path="url(#clip-path)" filter="url(#glow)" />
+                        <path d="M6 9.47214V14C6 15.1046 6.89543 16 8 16H227.5C228.605 16 229.5 15.1046 229.5 14V9.47214C229.5 9.16165 229.428 8.85542 229.289 8.57771L226.053 2.10557C225.714 1.428 225.021 1 224.264 1H11.2361C10.4785 1 9.786 1.428 9.44721 2.10557L6.21115 8.57771C6.07229 8.85542 6 9.16165 6      9.47214Z" stroke="url(#paint0_linear_1_46)" style="mix-blend-mode:overlay"/>
+                            </g>
+                            <g filter="url(#filter1_f_1_46)">
+                                <path d="M6 9H230V11H6V9Z" fill="black" fill-opacity="0.17" style="mix-blend-mode:overlay"/>
+                            </g>
+                            <defs>
+                                <filter id="filter0_bi_1_46" x="-14.5" y="-19.5" width="264.5" height="56" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                    <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                    <feGaussianBlur in="BackgroundImageFix" stdDeviation="10"/>
+                                    <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_1_46"/>
+                                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_1_46" result="shape"/>
+                                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                    <feOffset dx="11" dy="5"/>
+                                    <feGaussianBlur stdDeviation="4.5"/>
+                                    <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+                                    <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.29 0"/>
+                                    <feBlend mode="normal" in2="shape" result="effect2_innerShadow_1_46"/>
+                                </filter>
+                                <filter id="filter1_f_1_46" x="0" y="3" width="236" height="14" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                    <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                                    <feGaussianBlur stdDeviation="3" result="effect1_foregroundBlur_1_46"/>
+                                </filter>
+                                <linearGradient id="paint0_linear_1_46" x1="143.5" y1="-1" x2="143.5" y2="16" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="white" stop-opacity="0"/>
+                                    <stop offset="1" stop-color="white" stop-opacity="0.4"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+                <div class="coins-per-hour">
+                    <div class="txt">Coins/hour</div>
+                    <div class="coins">
+                        <img src="Elements/coin_icon.png" alt="coin">
+                        6.2K
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="balance-container">
+        <div class="balance">
+            <img src="Elements/coin_icon.png" alt="coin">
+            <span id="balance">0</span>
+        </div>
+    </div>
+
+    <div class="hamster-container" id="vibrateButton">
+        <svg width="418" height="418" viewBox="0 0 388 388" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Внешний вектор -->
+            <g filter="url(#filter0_d_1_14)">
+                <circle cx="194" cy="194" r="174" fill="url(#paint0_linear_1_14)" />
+            </g>
+            <!-- Внутренний вектор -->
+            <g filter="url(#filter0_i_1_15)">
+                <ellipse cx="194" cy="194" rx="154" ry="154" fill="url(#paint1_linear_1_15)" />
+            </g>
+            <!-- Изображение персонажа -->
+            <image x="134" y="40" width="120" height="300" href="Elements/character.png" />
+            <defs>
+                <!-- Градиент для внешнего круга -->
+                <linearGradient id="paint0_linear_1_14" x1="194" y1="20" x2="194" y2="368" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#93E2E8" />
+                    <stop offset="1" stop-color="#0A2F38" />
+                </linearGradient>
+                <!-- Градиент для внутреннего круга -->
+                <linearGradient id="paint1_linear_1_15" x1="194" y1="50" x2="194" y2="338" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#93E2E8" />
+                    <stop offset="1" stop-color="#0A2F38" />
+                </linearGradient>
+                <!-- Фильтр для внешнего круга -->
+                <filter id="filter0_d_1_14" x="0" y="0" width="388" height="388" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                    <feOffset dy="-8" />
+                    <feGaussianBlur stdDeviation="10" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0.572549 0 0 0 0 0.878431 0 0 0 0 0.901961 0 0 0 0.25 0" />
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_14" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_14" result="shape" />
+                </filter>
+                <!-- Фильтр для внутреннего круга -->
+                <filter id="filter0_i_1_15" x="-10" y="-10" width="388" height="388" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                    <feMorphology radius="20" operator="erode" in="SourceAlpha" result="effect1_innerShadow_1_15" />
+                    <feOffset />
+                    <feGaussianBlur stdDeviation="14" />
+                    <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0.115234 0 0 0 0 0.115234 0 0 0 0 0.115234 0 0 0 0.5 0" />
+                    <feBlend mode="normal" in2="shape" result="effect1_innerShadow_1_15" />
+                </filter>
+            </defs>
+        </svg>
+    </div>
+
+
+    <div class="energy-container">
+        <div class="energy">
+            <img src="Elements/energy_icon.svg" alt="Energy Icon">
+            <span id="energy">100</span>
+            /
+            <span id="max-energy">100</span>
+        </div>
+        <button class="boost-button" onclick="openBoostMenu()">
+            <img src="Elements/boost.svg" alt="boost icon">
+            Boost
+        </button>
+    </div>
+    <div class="overlay" id="overlay"></div>
+    <div class="reward-details" id="rewardDetails">
+        <button class="close-button" onclick="collectRewards()">✖</button>
+        <div class="reward-amount" id="rewardAmount"></div>
+        <div class="reward-description">Bot mined some coins for you</div>
+        <button class="reward-button" onclick="collectRewards()">Thanks</button>
+    </div>
+    <div class="menu">
+        <button class="active" onclick="navigate('index.html')">
+            <img src="Elements/Menu/mine_icon_active.svg" alt="Mine">
+            Mine
+        </button>
+        <button onclick="navigate('friends.html')">
+            <img src="Elements/Menu/friends_icon.svg" alt="Friends">
+            Friends
+        </button>
+        <button onclick="navigate('earn.html')">
+            <img src="Elements/Menu/earn_icon.png" alt="Earn">
+            Earn
+        </button>
+        <button onclick="navigate('earn.html')">
+            <img src="Elements/Menu/cards_icon.svg" alt="Cards">
+            Cards
+        </button>
+        <button onclick="navigate('wallet.html')">
+            <img src="Elements/Menu/wallet_icon.svg" alt="Wallet">
+            Wallet
+        </button>
+    </div>
+
+    <script>
+        eruda.init();
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+        Telegram.WebApp.BackButton.hide();
+
+
+        let balance = 0;
+        let energy = 100;
+        let maxEnergy = 100;
+        let currentLeague = 'Bronze';
+        let damageAmount = 1;
+        let energyRecoveryLevel = 1;
+        let multiplier = 1;
+
+        const loadingScreen = document.getElementById('loadingScreen');
+
+        function saveBalanceToSessionStorage() {
+            sessionStorage.setItem('balance', balance);
+        }
+
+        function saveEnergyToSessionStorage() {
+            sessionStorage.setItem('current_energy', energy);
+            sessionStorage.setItem('max_energy', maxEnergy);
+        }
+
+        function saveLeagueToSessionStorage() {
+            sessionStorage.setItem('currentLeague', currentLeague);
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const hamsterContainer = document.getElementById('vibrateButton');
+            const activeTouches = new Set();
+        
+            hamsterContainer.addEventListener('touchstart', (event) => {
+                event.preventDefault(); // Предотвращаем вызов клика по умолчанию
+                for (let i = 0; i < event.touches.length; i++) {
+                    const touch = event.touches[i];
+                    if (!activeTouches.has(touch.identifier) && isTouchInsideCircle(touch, hamsterContainer)) {
+                        activeTouches.add(touch.identifier);
+                        handleTouch(touch);
+                    }
+                }
+            });
+        
+            hamsterContainer.addEventListener('touchend', (event) => {
+                for (let i = 0; i < event.changedTouches.length; i++) {
+                    const touch = event.changedTouches[i];
+                    activeTouches.delete(touch.identifier);
+                }
+            });
+        
+            function handleTouch(touch) {
+                // Прямо вызываем функцию обработки баланса
+                increaseBalance(touch);
+            }
+        
+            function isTouchInsideCircle(touch, element) {
+                const rect = element.getBoundingClientRect();
+                const radius = rect.width / 2;
+                const centerX = rect.left + radius;
+                const centerY = rect.top + radius;
+                const touchX = touch.clientX;
+                const touchY = touch.clientY;
+                const distance = Math.sqrt(Math.pow(touchX - centerX, 2) + Math.pow(touchY - centerY, 2));
+                return distance <= radius;
+            }
+        });
+        
+        function increaseBalance(event) {
+            // Извлекаем данные из session storage
+            let energy = parseInt(sessionStorage.getItem('current_energy'));
+            const damageAmount = parseInt(sessionStorage.getItem('damage_amount'));
+            const multiplier = parseFloat(sessionStorage.getItem('multiplier') || 1); // Если multiplier не установлен, используем значение 1
+        
+            // Проверка на корректность данных
+            if (!isNaN(energy) && !isNaN(damageAmount)) {
+                if (energy >= damageAmount) {
+                    const adjustedDamage = damageAmount * multiplier;
+                    let balance = parseInt(sessionStorage.getItem('balance') || 0); // Если balance не установлен, используем значение 0
+        
+                    // Обновляем значения
+                    balance += adjustedDamage;
+                    energy -= damageAmount;
+        
+                    const nextLeagueMinBalance = getNextLeagueMinBalance(currentLeague);
+                    if (balance >= nextLeagueMinBalance) {
+                        currentLeague = getNextLeague(currentLeague);
+                        sessionStorage.setItem('league', currentLeague);
+                    }
+        
+                    // Сохраняем обновленные значения в session storage
+                    sessionStorage.setItem('balance', balance);
+                    sessionStorage.setItem('current_energy', energy);
+        
+                    // Отображаем изменения на UI
+                    showDamage(event, adjustedDamage);
+                    updateBalance();
+                    updateEnergy();
+                    updateProgress();
+                    updateLeague();
+        
+                    // Вызов легкой вибрации
+                    const haptic = Telegram.WebApp.HapticFeedback;
+                    haptic.impactOccurred('heavy');
+                }
+            } else {
+                console.error('Error: Invalid data in session storage.');
+            }
+        }
+
+
+
+        function hideLoadingScreen() {
+            loadingScreen.style.display = 'none';
+        }
+
+        function showLoadingScreen() {
+            loadingScreen.style.display = 'flex';
+        }
+
+
+        function checkAndResetMultiplier() {
+            const turboEndTime = parseInt(sessionStorage.getItem('turbo_end_time'), 10);
+            const currentTime = Math.floor(Date.now() / 1000); // Текущее время в секундах
+        
+            if (!isNaN(turboEndTime) && currentTime >= turboEndTime) {
+                const userId = Telegram.WebApp.initDataUnsafe.user.id;
+                sessionStorage.removeItem('multiplier');
+                sessionStorage.removeItem('turbo_end_time');
+            }
+        }
+        
+
+
+
+    
+
+        /*function increaseBalance(event) {
+            if (energy >= damageAmount) {
+                const adjustedDamage = damageAmount * multiplier;
+                balance += adjustedDamage;
+                energy -= damageAmount;
+                showDamage(event, adjustedDamage);
+                updateBalance();
+                updateEnergy();
+                updateProgress();
+                const haptic = Telegram.WebApp.HapticFeedback;
+        
+                // Вызов легкой вибрации
+                haptic.impactOccurred('medium');
+                
+
+                const userId = Telegram.WebApp.initDataUnsafe.user.id;
+                fetch(`${CONFIG.BASE_URL}update_balance_and_league.php?telegram_id=${userId}&balance=${balance}&energy_used=${damageAmount}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            fetchUserData();
+                        } else {
+                            console.error('Error updating balance and league:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating balance and league:', error);
+                    });
+            }
+        }*/
+
+        function showDamage(event, amount) {
+            const hamsterContainer = document.querySelector('.hamster-container');
+            const damageElement = document.createElement('div');
+            damageElement.className = 'damage';
+            damageElement.innerText = `+${amount}`;
+
+            const x = event.clientX - hamsterContainer.getBoundingClientRect().left;
+            const y = event.clientY - hamsterContainer.getBoundingClientRect().top;
+
+            damageElement.style.left = `${x}px`;
+            damageElement.style.top = `${y}px`;
+
+            hamsterContainer.appendChild(damageElement);
+
+            setTimeout(() => {
+                damageElement.remove();
+            }, 1000);
+        }
+
+        function setBalance() {
+            const balanceElement = document.getElementById('balance');
+            const balance = sessionStorage.getItem('balance');
+            if (balance !== null) {
+                // Преобразование строки баланса в число и форматирование
+                const formattedBalance = Number(balance).toLocaleString('ru-RU');
+                balanceElement.innerText = formattedBalance;
+            }
+        }
+
+
+        function updateBalance() {
+            const balanceElement = document.getElementById('balance');
+            const newBalance = parseInt(sessionStorage.getItem('balance'), 10);
+        
+            // Удаляем пробелы из текущего баланса и преобразуем его в число
+            const currentBalance = parseInt(balanceElement.innerText.replace(/\s/g, ''), 10);
+            
+            // Если текущий баланс меньше нового, будем его увеличивать
+            if (currentBalance < newBalance) {
+                let increment = currentBalance;
+                const interval = setInterval(() => {
+                    increment++;
+                    balanceElement.innerText = increment.toLocaleString('ru-RU');
+        
+                    if (increment >= newBalance) {
+                        clearInterval(interval);
+                    }
+                }, 10); // скорость увеличения числа, можно настроить
+            } else {
+                balanceElement.innerText = newBalance.toLocaleString('ru-RU');
+            }
+        }
+
+
+
+        function updateEnergy() {
+            const savedEnergy = parseInt(sessionStorage.getItem('current_energy'), 10);
+            const savedMaxEnergy = parseInt(sessionStorage.getItem('max_energy'), 10);
+            
+            document.getElementById('energy').innerText = savedEnergy;
+            document.getElementById('max-energy').innerText = savedMaxEnergy;
+        }
+
+        function updateLeague() {
+            let currentLeague = sessionStorage.getItem('league');
+            document.getElementById('league').innerText = currentLeague;
+        }
+
+
+        const leagues = {
+            'Bronze': 0,
+            'Silver': 10,
+            'Gold': 50,
+            'Platinum': 100,
+            'Diamond': 200
+        };
+
+        function updateProgress() {
+            const progressElement = document.getElementById('progress-fill');
+
+            const currentLeague = sessionStorage.getItem('league') || 'Bronze';
+            const leagueMinBalance = getLeagueMinBalance(currentLeague);
+            const nextLeagueMinBalance = getNextLeagueMinBalance(currentLeague);
+            const balance = parseInt(sessionStorage.getItem('balance'), 10);
+            const progressPercentage = (balance / nextLeagueMinBalance) * 100;
+
+            // Установим ширину заполнения
+            const newWidth = `${Math.min(progressPercentage, 100) * 2.36}`; // 2.27 - коэффициент для пересчета процента в px для viewBox 236px ширины
+            progressElement.setAttribute('width', newWidth);
+
+
+            // Изменим градиент в зависимости от лиги
+            let gradientId;
+            switch (currentLeague) {
+                case 'Silver':
+                    gradientId = 'silver-gradient';
+                    break;
+                case 'Gold':
+                    gradientId = 'gold-gradient';
+                    break;
+                case 'Platinum':
+                    gradientId = 'platinum-gradient';
+                    break;
+                case 'Diamond':
+                    gradientId = 'diamond-gradient';
+                    break;
+                default:
+                    gradientId = 'bronze-gradient';
+                    break;
+    }
+            progressElement.setAttribute('fill', `url(#${gradientId})`);
+
+}
+
+        function getNextLeagueMinBalance(currentLeague) {
+            const nextLeague = getNextLeague(currentLeague);
+            return leagues[nextLeague];
+        }
+
+        function getLeagueMinBalance(league) {
+            return leagues[league];
+        }
+
+        function getNextLeague(currentLeague) {
+            const leagueKeys = Object.keys(leagues);
+            const currentIndex = leagueKeys.indexOf(currentLeague);
+            const nextIndex = currentIndex + 1;
+            return nextIndex < leagueKeys.length ? leagueKeys[nextIndex] : currentLeague;
+        }
+
+
+        function fetchUserData() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            return fetch(`${CONFIG.BASE_URL}get_balance_energy_and_league.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        balance = data.balance;
+                        energy = data.current_energy;
+                        maxEnergy = 100 + 10 * (data.energy_level - 1);
+                        currentLeague = data.league;
+                        damageAmount = data.damage_level;
+                        energyRecoveryLevel = data.energy_recovery_level;
+                        dailyFullEnergyCount = data.daily_full_energy_count;
+                        dailyTurboCount = data.daily_turbo_count;
+                        energyLevel = data.energy_level;
+                        miningBotStatus = data.mining_bot_status;
+        
+                        // Сохранение данных в session storage
+                        sessionStorage.setItem('balance', balance);
+                        sessionStorage.setItem('current_energy', energy);
+                        sessionStorage.setItem('max_energy', maxEnergy);
+                        sessionStorage.setItem('league', currentLeague);
+                        sessionStorage.setItem('damage_amount', damageAmount);
+                        sessionStorage.setItem('energy_recovery_level', energyRecoveryLevel);
+                        sessionStorage.setItem('daily_full_energy_count', dailyFullEnergyCount);
+                        sessionStorage.setItem('daily_turbo_count', dailyTurboCount);
+                        sessionStorage.setItem('energy_level', energyLevel);
+                        sessionStorage.setItem('mining_bot_status', miningBotStatus);
+        
+                        // Обновление UI
+                        setBalance();
+                        updateEnergy();
+                        updateLeague();
+                        updateProgress();
+                    } else {
+                        console.error('Error fetching user data:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                });
+        }
+
+
+
+
+
+        function regenerateEnergy() {
+            // Извлекаем данные из session storage
+            let energy = parseInt(sessionStorage.getItem('current_energy'));
+            const maxEnergy = parseInt(sessionStorage.getItem('max_energy'));
+            const energyRecoveryLevel = parseInt(sessionStorage.getItem('energy_recovery_level'));
+        
+            if (!isNaN(energy) && !isNaN(maxEnergy) && !isNaN(energyRecoveryLevel)) {
+                // Рассчитываем новое значение энергии
+                const regeneratedEnergy = energy + energyRecoveryLevel;
+                energy = Math.min(regeneratedEnergy, maxEnergy);
+
+                // Сохраняем новое значение энергии в session storage
+                sessionStorage.setItem('current_energy', energy);
+
+                // Обновляем интерфейс
+                updateEnergy();
+            } else {
+                console.error('Error: Invalid energy data in session storage.');
+            }
+        }
+
+        function openLeagueMenu() {
+            window.location.href = 'leagues.html';
+        }
+
+        function openBoostMenu() {
+            window.location.href = 'boost.html';
+        }
+
+        function navigate(page) {
+            window.location.href = `${page}`;
+        }
+
+        function getUserData() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            return fetch(`${CONFIG.BASE_URL}get_user_profile.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const user = data.user;
+                        document.getElementById('username').innerText = user.full_name;
+                        const profileImgElement = document.getElementById('profileImg');
+                        profileImgElement.src = user.profile_img_url;
+                        profileImgElement.onerror = function() {
+                            profileImgElement.src = 'default_profile_img.png';
+                        };
+
+                        localStorage.setItem('userData', JSON.stringify({
+                            username: user.full_name,
+                            profileImg: user.profile_img_url
+                        }));
+                    } else {
+                        console.error('Error fetching user profile:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user profile:', error);
+                });
+        }
+
+        function parseStartParam() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const startParam = urlParams.get('tgWebAppStartParam');
+            if (startParam) {
+                const userId = Telegram.WebApp.initDataUnsafe.user.id;
+                const username = Telegram.WebApp.initDataUnsafe.user.username || '';
+                const fullName = `${Telegram.WebApp.initDataUnsafe.user.first_name || ''} ${Telegram.WebApp.initDataUnsafe.user.last_name || ''}`.trim();
+                const profileImgUrl = Telegram.WebApp.initDataUnsafe.user.photo_url || 'default_profile_img.png';
+                addUser(userId, username, profileImgUrl, fullName, startParam);
+            }
+        }
+
+        function addUser(userId, username, profileImgUrl, fullName, invitedByCode) {
+            fetch(`${CONFIG.BASE_URL}add_user.php?telegram_id=${userId}&username=${username}&full_name=${fullName}&profile_img_url=${profileImgUrl}&invited_by_code=${invitedByCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('User added successfully.');
+                    } else {
+                        console.error('Error adding user:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding user:', error);
+                });
+        }
+
+        function sendMessageWithButton(text, buttonText, buttonUrl) {
+            const xhr = new XMLHttpRequest();
+            const url = `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/sendMessage`;
+            const chatId = Telegram.WebApp.initDataUnsafe.user.id;
+            const params = JSON.stringify({
+                chat_id: chatId,
+                text: text,
+                reply_markup: {
+                    inline_keyboard: [[
+                    {
+                        text: buttonText,
+                        url: buttonUrl
+                    }
+                  ]]
+                }
+            });
+
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log('Message sent successfully');
+                } else if (xhr.readyState === 4) {
+                    console.error('Error sending message:', xhr.responseText);
+                }
+            };
+            xhr.send(params);
+        }
+
+        function checkAndSendMessage(text, buttonText, buttonUrl) {
+            const chatId = Telegram.WebApp.initDataUnsafe.user.id;
+            const getChatMemberCountUrl = `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getChatMemberCount?chat_id=${chatId}`;
+
+            // Проверка количества участников в чате
+            fetch(getChatMemberCountUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok && data.result === 1) {
+                // Отправка сообщения с инлайн-кнопкой
+                    sendMessageWithButton(chatId, text, buttonText, buttonUrl);
+                } else {
+                console.log('Chat is active, not sending new message');
+                }
+            })
+            .catch(error => {
+            console.error('Error checking chat:', error);
+            });
+        }
+
+        function recordActivity() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}record_activity.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('User activity recorded successfully.');
+                    } else {
+                        console.error('Error recording user activity:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error recording user activity:', error);
+                });
+        }
+
+        function updateLastActivity() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}update_last_activity.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('Error updating last activity:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating last activity:', error);
+                });
+        }
+
+        function showRewardDetails(coins) {
+            pendingCoins = coins;
+            document.getElementById('rewardAmount').innerText = `+${coins} coins`;
+            document.getElementById('rewardDetails').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closeRewardDetails() {
+            document.getElementById('rewardDetails').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        function checkRewards() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            return fetch(`${CONFIG.BASE_URL}collect_rewards.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.coins_earned > 0) {
+                        showRewardDetails(data.coins_earned);
+                    }
+                })
+                .catch(error => console.error('Error collecting rewards:', error));
+        }
+
+        function animateBalanceIncrease(coins) {
+            const balanceElement = document.getElementById('balance');
+            const currentBalance = parseInt(balanceElement.innerText);
+            const targetBalance = currentBalance + coins;
+            let current = currentBalance;
+
+            const interval = setInterval(() => {
+                current += 1;
+                balanceElement.innerText = current;
+                balanceElement.classList.add('balance-increase');
+                if (current >= targetBalance) {
+                    clearInterval(interval);
+                    balanceElement.classList.remove('balance-increase');
+                }
+            }, 10);
+        }
+
+        function collectRewards() {
+            closeRewardDetails();
+        
+            // Получаем текущие значения из sessionStorage
+            let balance = parseInt(sessionStorage.getItem('balance') || 0);
+            let energy = parseInt(sessionStorage.getItem('current_energy') || 0);
+        
+            // Анимируем увеличение баланса
+            animateBalanceIncrease(pendingCoins);
+        
+            // Обновляем баланс
+            balance += pendingCoins;
+            sessionStorage.setItem('balance', balance);
+        
+            // Обновляем значения на UI
+            updateBalance();
+            updateEnergy();
+            updateProgress();
+        
+            // Обновляем данные на сервере
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}update_balance_and_league.php?telegram_id=${userId}&balance=${balance}&energy_used=0`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Обновляем данные пользователя после успешного обновления баланса
+                        sessionStorage.setItem('balance', balance);
+                        sessionStorage.setItem('current_energy', energy);
+        
+                        updateBalance();
+                        updateEnergy();
+                        updateProgress();
+                    } else {
+                        console.error('Error updating balance and league:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating balance and league:', error);
+                });
+        }
+
+
+        function isMobileDevice() {
+            return /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent);
+        }
+
+        window.onload = function() {
+            if (!isMobileDevice()) {
+                document.getElementById('overlay2').style.display = 'block';
+                var scripts = document.getElementsByTagName('script');
+                for (var i = 0; i < scripts.length; i++) {
+                    if (scripts[i] !== document.currentScript) {
+                        scripts[i].parentNode.removeChild(scripts[i]);
+                    }
+                }
+            }
+        };
+
+        function sendDataToServer() {
+            // Извлекаем данные из session storage
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            const balance = sessionStorage.getItem('balance');
+            const currentLeague = sessionStorage.getItem('league');
+            const currentEnergy = sessionStorage.getItem('current_energy');
+            const lastEnergyUpdate = new Date().toISOString(); // Текущее время
+
+            // Проверка на наличие данных
+            if (balance !== null && currentLeague !== null && currentEnergy !== null) {
+                // Подготовка данных для отправки
+                const data = {
+                    telegram_id: userId,
+                    balance: balance,
+                    league: currentLeague,
+                    current_energy: currentEnergy,
+                    last_energy_update: lastEnergyUpdate
+                };
+
+                // Отправка данных на сервер
+                fetch(`${CONFIG.BASE_URL}update_user_and_boost.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Data successfully sent to the server.');
+                        // Обновляем время последнего обновления энергии в session storage
+                        sessionStorage.setItem('last_energy_update', lastEnergyUpdate);
+                    } else {
+                        console.error('Error sending data to the server:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending data to the server:', error);
+                });
+            } else {
+                console.error('Error: Missing data in session storage.');
+            }
+        }
+
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Telegram.WebApp.ready();
+            // Обёртка для requestWriteAccess для использования промисов
+            function requestWriteAccess() {
+                return new Promise((resolve, reject) => {
+                    const status = Telegram.WebApp.requestWriteAccess();
+                    if (status) {
+                        resolve(status);
+                    } else {
+                        reject('Request write access failed');
+                    }
+                });
+            }
+
+            requestWriteAccess().then((status) => {
+                console.log('Write access status:', status);
+                if (status && status.status === "allowed") {
+                    console.log('Write access granted');
+                    Telegram.WebApp.sendMessage('Thank you for granting write access!');
+                } else {
+                    console.error('Write access not granted:', status);
+                }
+            }).catch((error) => {
+                console.error('Failed to get write access:', error);
+            });
+            Telegram.WebApp.BackButton.hide();
+            Telegram.WebApp.expand();
+
+            //updateBalance2();
+            updateLeague();
+            
+
+            Promise.all([
+                //fetchAndLogMultiplier(),
+                getUserData(),
+                fetchUserData(),
+                parseStartParam(),
+                checkRewards()
+            ]).then(() => {
+                hideLoadingScreen();
+            }).catch((error) => {
+                console.error('Error during initialization:', error);
+                hideLoadingScreen(); // Hide even if there's an error
+            });
+
+            setInterval(regenerateEnergy, 1000);
+            checkAndSendMessage('Thank you for granting write access!', 'Open Web App', 'https://t.me/Testtestclickerclickerbot/start');
+            //setInterval(recordActivity, 10000); // Record activity every 10 seconds
+            setInterval(updateLastActivity, 60000); // Отправка активности каждые 5 секунд
+            // Запуск функции отправки данных на сервер раз в 5 минут (300000 миллисекунд)
+            setInterval(sendDataToServer, 5000);
+            setInterval(checkAndResetMultiplier, 1000);
+
+        });
+
+        setBalance();
+        updateEnergy();
+        updateProgress();
+    </script>
+</body>
+</html>

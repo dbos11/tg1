@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TonConnect Wallet Connection</title>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tonweb/dist/tonweb.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+    body {
+        font-family: 'Geologica';
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #031223;
+        color: white;
+        overflow: hidden;
+        overflow-y: auto;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        ser-select: none;
+    }
+
+    .bg-img {
+        position: relative;
+        display: flex;
+        right: 13vw;
+        transform: scale(1.2) scaleX(-1); /* Увеличение изображения в 2.5 раза и отзеркаливание по горизонтали */
+        transform-origin: center;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+        z-index: -1;
+    }
+
+
+    #connect-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .balance-container1 {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+        height: fit-content;
+        box-sizing: border-box;
+        margin-top: 4%;
+        margin-bottom: 7px;
+    }
+
+    .balance-title1{
+        margin-rigt: auto;
+        display: inline-block;
+        overflow-wrap: break-word;
+        font-family: 'Geologica';
+        font-weight: 500;
+        font-size: 28px;
+        color: #FFFFFF;
+    }
+
+    .balance-container2 {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+        height: fit-content;
+        box-sizing: border-box;
+        margin-bottom: 0;
+        flex-direction: row;
+    }
+
+    .balance-title2{
+        overflow-wrap: break-word;
+        font-family: 'Geologica';
+        margin-right: auto;
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 1.4;
+        color: #FFFFFF;
+    }
+
+    .balance-img{
+        margin: 3px 6% 1px 0;
+        width: 16px;
+        height: 16px;
+    }
+
+    .button-container{
+        border-radius: 8px;
+        background: linear-gradient(90deg, #28B4C6, #1591A1);
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+        padding: 10.5px 0;
+        width: 90%;
+        height: 48px;
+        box-sizing: border-box;
+    }
+
+    .button-title{
+        margin: 4px 0;
+        display: inline-block;
+        overflow-wrap: break-word;
+        font-family: 'Inter';
+        font-weight: 500;
+        font-size: 16px;
+        color: #FFFFFF;
+    }
+
+    .button-image{
+        margin-right: 8px;
+        width: 27px;
+        height: 27px;
+        }
+
+
+    .menu {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        background-color: #282B30;
+        padding: 5px 5px;
+        border-radius: 20px;
+        width: 90%;
+    }
+
+    .menu {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        position: fixed;
+        bottom: 16px;
+        background: var(--token);
+        -webkit-backdrop-filter: blur(5px); /* Префикс для Safari */
+        backdrop-filter: blur(5px);
+        padding: 5px 5px;
+        border-radius: 20px;
+        width: 90%;
+        z-index: 10;
+    }
+    .menu button {
+        background-color: transparent;
+        color: white;
+        border: none;
+        padding: 5px;
+        font-family: 'Geologica', sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 15px;
+        width: 20%;
+        text-align: center;
+        cursor: pointer;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-grow: 1;
+    }
+    .background-blur {
+        z-index: -1; /* Убедитесь, что фон находится позади всего остального контента */
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow: visible;
+        width: 100vw; /* Используем 100vw для ширины всего экрана */
+        height: 100vh; /* Используем 100vh для высоты всего экрана */
+        pointer-events: none; /* Отключает события мыши для фона */
+    }
+    .background-blur2 {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 100%;
+    }
+    .blur-center {
+        display: flex;
+        justify-content: center; /* Выравнивание по центру по горизонтали */
+        width: 100%;
+    }
+    </style>
+</head>
+<body>
+    <div class="background-blur">
+        <div className="blur-center">
+            <svg width="740" height="326" viewBox="0 0 740 326" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_f_68_15)">
+                    <ellipse cx="370" cy="-84" rx="70" ry="110" fill="#21C9E3" />
+                </g>
+                <defs>
+                    <filter id="filter0_f_68_15" x="0" y="-494" width="740" height="820" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                    <feGaussianBlur stdDeviation="150" result="effect1_foregroundBlur_68_15" />
+                    </filter>
+                </defs>
+            </svg>
+        </div>
+    </div>
+    <div class="background-blur">
+        <svg class="background-blur2" width="375" height="400" viewBox="0 0 375 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g filter="url(#filter0_f_1_11)">
+            <ellipse cx="348.754" cy="366.389" rx="73.6571" ry="56.5366" transform="rotate(47.3736 348.754 366.389)" fill="#21C9E3" />
+          </g>
+          <defs>
+            <filter id="filter0_f_1_11" x="-16.199" y="0.0279541" width="729.905" height="732.723" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+              <feGaussianBlur stdDeviation="150" result="effect1_foregroundBlur_1_11" />
+            </filter>
+          </defs>
+        </svg>
+    </div>
+    <div class="balance-container1">
+        <div class="balance-title1">Airdrop is coming...</div>
+    </div>
+    <div class="balance-container2">
+        <div class="balance-title2">Here you can exchange your points for tokens</div>
+        <img class="balance-img" src="си\assets\images\remove_bg_ai_17213106104991.png">
+    </div>
+    <div id="connect-button"> </div>
+    <button class="button-container">
+        <img class="button-image" src="си\assets\vectors\icon_2_x2.svg">
+        <div class="button-title">Token withdrawal</div>
+    </button>
+    <img class="bg-img" src="си/assets/images/remove_bg_ai_17214682744261.png">
+    <div class="menu">
+        <button onclick="navigate('index.html')">
+            <img src="mine_icon.png" alt="Mine">
+            Mine
+        </button>
+        <button onclick="navigate('friends.html')">
+            <img src="friends_icon.png" alt="Friends">
+            Friends
+        </button>
+        <button onclick="navigate('earn.html')">
+            <img src="earn_icon.png" alt="Earn">
+            Earn
+        </button>
+        <button onclick="navigate('earn.html')">
+            <img src="cards_icon.png" alt="Cards">
+            Cards
+        </button>
+        <button class="active" onclick="navigate('wallet.html')">
+            <img src="wallet_icon.png" alt="Wallet">
+            Wallet
+        </button>
+    </div>
+
+    <script>
+        eruda.init();
+
+        function navigate(page) {
+            window.location.href = `/telegram/${page}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Инициализация Telegram Web App
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+            } else {
+                console.error("Telegram Web App не инициализирован");
+                return;
+            }
+
+            const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                manifestUrl: 'https://481a5ac5f7ec.ngrok.app/telegram/tonconnect-manifest.json',
+                buttonRootId: 'connect-button'
+            });
+
+            // Customize the UI options if needed
+            tonConnectUI.uiOptions = {
+                language: 'ru',
+                uiPreferences: {
+                    theme: TON_CONNECT_UI.THEME.DARK,
+                    borderRadius: 's',
+                    colorsSet: {
+                        [TON_CONNECT_UI.THEME.DARK]: {
+                            connectButton: {
+                                background: '#29CC6A'
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Fetch and log wallets list
+            try {
+                const walletsList = await tonConnectUI.getWallets();
+                console.log('Available wallets:', walletsList);
+            } catch (error) {
+                console.error('Error fetching wallets:', error);
+            }
+
+            // Handle wallet connection status changes
+            const unsubscribe = tonConnectUI.onStatusChange(wallet => {
+                if (wallet) {
+                    console.log('Wallet connected:', wallet);
+                    handleWalletConnected(wallet);
+                } else {
+                    console.log('Wallet disconnected');
+                    handleWalletDisconnected();
+                }
+            });
+
+            function handleWalletConnected(wallet) {
+                // Check the structure of the connected wallet object
+                console.log('Connected wallet object:', wallet);
+
+                // Access the address directly
+                let wallet_hash = wallet.account ? wallet.account.address : 'Address not found';
+                console.log('Connected wallet hash:', wallet_hash);
+
+                // Convert address to Base64
+                let wallet_address;
+                try {
+                    const tonweb = new TonWeb();
+                    const walletAddress = new tonweb.utils.Address(wallet_hash);
+                    wallet_address = walletAddress.toString(true, true, true);
+                    console.log('Connected wallet address:', wallet_address);
+                } catch (e) {
+                    console.error('Error converting address:', e);
+                    wallet_address = 'Conversion error';
+                }
+
+                // Save wallet to the database
+                saveWalletToDB(wallet_address, wallet_hash);
+            }
+
+            function handleWalletDisconnected() {
+                // Handle wallet disconnection
+                console.log('Wallet has been disconnected');
+                // Add your logic here, for example, clear UI, reset state, etc.
+            }
+
+            function saveWalletToDB(wallet_address, wallet_hash) {
+                const telegramId = Telegram.WebApp.initDataUnsafe.user.id;
+                const formData = new FormData();
+                formData.append('telegram_id', telegramId);
+                formData.append('wallet_address', wallet_address);
+                formData.append('wallet_hash', wallet_hash);
+
+                fetch('save_wallet.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Wallet saved successfully');
+                    } else {
+                        console.error('Error saving wallet:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving wallet:', error);
+                });
+            }
+
+            // Optional: Unsubscribe when no longer needed
+            // unsubscribe();
+        });
+    </script>
+</body>
+</html>

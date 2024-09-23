@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Telegram App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        /* Styles from friends.html */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #031223;
+            color: white;
+            overflow-y: auto;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: #202225;
+        }
+        .header img {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .header span {
+            font-size: 20px;
+        }
+        .invite-section {
+            text-align: center;
+            margin-top: 20px;
+            width: 90%;
+            padding-bottom: 150px;
+        }
+        .invite-title {
+            font-weight: 600;
+            font-size: 32px;
+            letter-spacing: 0.02em;
+            color: #fff;
+            margin-top: 27px;
+        }
+        .invite-subtitle {
+            font-weight: 400;
+            font-size: 16px;
+            letter-spacing: 0.02em;
+            color: #fff;
+            margin-top: 13px;
+        }
+        .invite-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 27px;
+        }
+        .invite-card img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .blur-object {
+            filter: blur(30px);
+            border-radius: 100%;
+            background: var(--cyan-grad, linear-gradient(180deg, #2FB8FF -160%, #9EECD9 100%));
+            position: absolute;
+            width: 29px; /* Делаем блюр такого же размера, как и изображение */
+            height: 29px;
+            z-index: 1; /* Задний план */
+        }
+        .invite-card .text {
+            flex-grow: 1;
+        }
+        .image-container {
+            position: relative; /* Контейнер для изображения и blur */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .image-container img{
+            width: 68px;
+            height: 65px;
+            z-index: 2;
+        }
+        .invite-card .text h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .invite-card .text p {
+            margin: 0;
+            font-size: 14px;
+            color: #b9bbbe;
+        }
+        .invite-card .text {
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.02em;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .bonus-txt {
+            font-weight: 500;
+            color: #fff;
+            margin-left: 5px;
+        }
+        .bonus {
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.02em;
+            color: #fcffac;
+            display: flex;
+        }
+        .bonus img {
+            width: 20px;
+            height: 20px;
+        }
+        .more-bonuses-btn {
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: 0.02em;
+            background: linear-gradient(90deg, #2fb8ff 0%, #9eecd9 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border: none;
+            margin-top: 20px;
+        }
+        .copy-link-btn {
+            background: #1591a1;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            padding: 16px 20px;
+            font-size: 22px;
+            cursor: pointer;
+            margin: 20px 0;
+            width: 17.5%;
+            text-align: center;
+        }
+        .copy-link-btn svg {
+            fill: #fff;
+        }
+        .friends-list-title {
+            font-weight: 400;
+            font-size: 16px;
+            margin-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            letter-spacing: 0.02em;
+            color: #fff;
+        }
+        .wrap {
+            position: relative;
+            display: inline-block;
+            border-radius: 4px;
+            background: linear-gradient(45deg, #2FB8FF, #9EECD9);
+            padding: 1.5px; /* Ширина обводки */
+            box-sizing: border-box;
+            margin-right: 15px;
+        }
+        .wrap img {
+            width: 33px;
+            height: 33px;
+            border-radius: 4px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+        .refresh-button {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        .friends-list {
+            width: 100%;
+            overflow-y: auto;
+            margin-top: 14px;
+        }
+        .friend-item {
+            background-color: #282B30;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 12px;
+            background: var(--token, linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)));
+            height: 60px;
+            padding: 12px 0px 12px 12px;
+            box-sizing: border-box;
+        }
+        .friend-item .info {
+            flex-grow: 1;
+            text-align: left;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        .friend-item .info h4 {
+            font-weight: 400;
+            font-size: 16px;
+            letter-spacing: 0.02em;
+            color: #fff;
+        }
+        .friend-item .info p {
+            font-weight: 300;
+            font-size: 14px;
+            letter-spacing: 0.02em;
+            color: rgba(255, 255, 255, 0.4);
+            margin-left: 5px;
+        }
+        .friend-item .coins {
+            color: #ffd700;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .bonus-list {
+            width: 100%;
+            margin-top: 20px;
+            display: none;
+            z-index: 10;
+        }
+        .bonus-item {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 12px;
+            padding: 10px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .bonus-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            z-index: 10;
+        }
+        .bonus-item .text {
+            flex-grow: 1;
+        }
+        .bonus-item .text h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        .bonus-item .text p {
+            margin: 0;
+            font-size: 14px;
+            color: #b9bbbe;
+        }
+        .bonus-item .amount {
+            color: #ffd700;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            position: fixed;
+            bottom: 16px;
+            background: var(--token);
+            -webkit-backdrop-filter: blur(5px); /* Префикс для Safari */
+            backdrop-filter: blur(5px);
+            padding: 5px 5px;
+            border-radius: 20px;
+            width: 90%;
+            z-index: 10;
+        }
+        .menu button {
+            background-color: transparent;
+            color: white;
+            border: none;
+            padding: 5px;
+            font-family: 'Geologica', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 15px;
+            width: 20%;
+            text-align: center;
+            cursor: pointer;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            user-select: none; /* отключает выделение текста */
+            -webkit-tap-highlight-color: transparent;
+        }
+        .menu button, .menu button:focus, .menu button:active {
+          outline: none;
+          box-shadow: none;
+        }
+        .container {
+            width: 26px; 
+            height: 26spx; 
+            overflow: visible; 
+            position: relative;
+            margin-bottom: 26px;
+            margin-top: auto;
+        }
+        .container svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -25%);
+            width: 52px; 
+            height: 52px; 
+        }
+        .invite-friends-btn {
+            background: #1591a1;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            position: fixed;
+            bottom: 60px;
+            right: 90px;
+            padding: 20px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 20px 0;
+            width: 72%;
+            animation: pulsate 1.5s infinite;
+            overflow-wrap: break-word;
+            font-family: 'Geologica';
+            font-weight: 400;
+            font-size: 16px;
+            color: #FFFFFF;
+            z-index: 10;
+        }
+        .background-blur {
+            z-index: -1; /* Убедитесь, что фон находится позади всего остального контента */
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow: visible;
+            width: 100vw; /* Используем 100vw для ширины всего экрана */
+            height: 100vh; /* Используем 100vh для высоты всего экрана */
+            pointer-events: none; /* Отключает события мыши для фона */
+        }
+        .background-blur1 {
+            z-index: -1; /* Убедитесь, что фон находится позади всего остального контента */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            overflow: visible;
+            width: 100vw; /* Используем 100vw для ширины всего экрана */
+            height: 100vh; /* Используем 100vh для высоты всего экрана */
+            pointer-events: none; /* Отключает события мыши для фона */
+        }
+        .background-blur2 {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .blur-center {
+            display: flex;
+            justify-content: center; /* Выравнивание по центру по горизонтали */
+            width: 100%;
+        }
+        .blur-center svg{
+            z-index: -1; /* Убедитесь, что фон находится позади всего остального контента */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+        }
+        @keyframes pulsate {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.95);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Styles from wallet.html */
+        .bg-img {
+            position: fixed;
+            transform: translateY(-15%);
+            transform-origin: center;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #connect-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .balance-container1 {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+            height: fit-content;
+            box-sizing: border-box;
+            margin-top: 4%;
+            margin-bottom: 7px;
+        }
+
+        .balance-title1 {
+            margin-rigt: auto;
+            display: inline-block;
+            overflow-wrap: break-word;
+            font-family: 'Geologica';
+            font-weight: 500;
+            font-size: 28px;
+            color: #FFFFFF;
+        }
+
+        .balance-container2 {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+            height: fit-content;
+            box-sizing: border-box;
+            margin-bottom: 0;
+            flex-direction: row;
+        }
+
+        .balance-title2 {
+            overflow-wrap: break-word;
+            font-family: 'Geologica';
+            margin-right: auto;
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #FFFFFF;
+        }
+
+        .balance-img {
+            margin: 3px 8% 1px 0;
+            width: 16px;
+            height: 16px;
+        }
+
+        .button-container {
+            border-radius: 8px;
+            background: linear-gradient(90deg, #28b4c6 0%, #1591a1 100%);
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row;
+            padding: 10.5px 0;
+            width: 90%;
+            height: 48px;
+            box-sizing: border-box;
+            margin-top: 12px;
+        }
+
+        .button-title {
+            margin: 4px 0;
+            display: inline-block;
+            overflow-wrap: break-word;
+            font-family: 'Inter';
+            font-weight: 500;
+            font-size: 16px;
+            color: #FFFFFF;
+        }
+
+        .button-image {
+            margin-right: 8px;
+            width: 27px;
+            height: 27px;
+        }
+        .hidden {
+            display: none;
+        }
+        .wallet-page {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .buttons-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            flex-direction: column;
+        }
+
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tonweb/dist/tonweb.js"></script>
+    <script src="configJS.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-blur">
+        <div className="blur-center">
+            <svg width="740" height="326" viewBox="0 0 740 326" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_f_68_15)">
+                    <ellipse cx="370" cy="-84" rx="70" ry="110" fill="#21C9E3" />
+                </g>
+                <defs>
+                    <filter id="filter0_f_68_15" x="0" y="-494" width="740" height="820" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                    <feGaussianBlur stdDeviation="150" result="effect1_foregroundBlur_68_15" />
+                    </filter>
+                </defs>
+            </svg>
+        </div>
+    </div>
+    <div class="background-blur">
+        <svg class="background-blur2" width="375" height="400" viewBox="0 0 375 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g filter="url(#filter0_f_1_11)">
+            <ellipse cx="348.754" cy="366.389" rx="73.6571" ry="56.5366" transform="rotate(47.3736 348.754 366.389)" fill="#21C9E3" />
+          </g>
+          <defs>
+            <filter id="filter0_f_1_11" x="-16.199" y="0.0279541" width="729.905" height="732.723" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+              <feGaussianBlur stdDeviation="150" result="effect1_foregroundBlur_1_11" />
+            </filter>
+          </defs>
+        </svg>
+    </div>
+
+    <div class="invite-section" id="friends-section">
+        <div class="invite-title">Invite friends!</div>
+        <div class="invite-subtitle">You and your friend will receive bonuses</div>
+        <div class="invite-card">
+            <div class="image-container">
+                <svg class="blur-object" width="89" height="89" viewBox="0 0 89 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g filter="url(#filter0_f_1_95)">
+                    <circle cx="44.5" cy="44.5" r="14.5" fill="url(#paint0_linear_1_95)" />
+                  </g>
+                  <defs>
+                    <filter id="filter0_f_1_95" x="0" y="0" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                      <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                      <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur_1_95" />
+                    </filter>
+                    <linearGradient id="paint0_linear_1_95" x1="44.5" y1="-16.4" x2="44.5" y2="59" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#2FB8FF" />
+                      <stop offset="1" stop-color="#9EECD9" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <img src="Elements/present.png" alt="Gift">
+            </div>
+            <div class="text">
+                <h3>Invite a friend</h3>
+                <div class="bonus">
+                    <img class="right-image" src="Elements/coin_icon.png" alt="Coins" width="24" height="24">
+                    +5,000
+                    <div class="bonus-txt"> for you and your friend</div>
+                </div>
+            </div>
+        </div>
+        <button class="more-bonuses-btn" onclick="toggleBonuses()">More bonuses</button>
+        <div class="bonus-list" id="bonusList">
+            <!-- Бонусы будут загружены сюда -->
+        </div>
+        <div class="friends-list-title">
+            <span id="friendsTitle">List of your friends (0)</span>
+        </div>
+        <div class="friends-list" id="friendsList">
+            <!-- Друзья будут загружены сюда -->
+        </div>
+        <div class="bonus-list-title" style="margin-top: 20px;">
+            <button class="invite-friends-btn" onclick="inviteFriend()">Invite a Friend</button>
+            <button class="copy-link-btn" onclick="copyReferralLink()">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13.97 1.83331H10.4004C8.78313 1.8333 7.50217 1.83329 6.49966 1.96861C5.46793 2.10788 4.63285 2.40132 3.97429 3.06252C3.31574 3.72373 3.02347 4.56216 2.88476 5.59803C2.74998 6.60456 2.74999 7.89066 2.75 9.51438V14.8654C2.75 16.2479 3.59329 17.4326 4.79157 17.9293C4.7299 17.0956 4.72994 15.9258 4.73 14.9527L4.73 10.4478L4.73 10.3605C4.72993 9.18566 4.72988 8.17338 4.83843 7.36275C4.95476 6.49399 5.2171 5.66124 5.88986 4.98578C6.56261 4.31032 7.39203 4.04693 8.25732 3.93013C9.06471 3.82114 10.0729 3.8212 11.2431 3.82126L11.33 3.82127H13.97L14.0569 3.82126C15.2271 3.8212 16.2331 3.82114 17.0405 3.93013C16.5575 2.70212 15.3648 1.83331 13.97 1.83331Z" fill="white" />
+                  <path d="M6.05009 10.4476C6.05009 7.94862 6.05009 6.69911 6.82333 5.92277C7.59657 5.14642 8.84107 5.14642 11.3301 5.14642H13.9701C16.4591 5.14642 17.7036 5.14642 18.4769 5.92277C19.2501 6.69911 19.2501 7.94862 19.2501 10.4476V14.8653C19.2501 17.3643 19.2501 18.6138 18.4769 19.3902C17.7036 20.1665 16.4591 20.1665 13.9701 20.1665H11.3301C8.84107 20.1665 7.59657 20.1665 6.82333 19.3902C6.05009 18.6138 6.05009 17.3643 6.05009 14.8653V10.4476Z" fill="white" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="wallet-page">
+        <div id="wallet-section" class="hidden" style="width: 100%">
+            <div class="buttons-section">
+                <div class="balance-container1">
+                    <div class="balance-title1">Airdrop is coming...</div>
+                </div>
+                <div class="balance-container2">
+                    <div class="balance-title2">Here you can exchange your points for tokens</div>
+                    <img class="balance-img" src="Elements/coin_icon.png">
+                </div>
+                <div id="connect-button" style="margin-top: 32px"> </div>
+                <button class="button-container">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a)"><path d="M27.5 14C27.5 6.544 21.456.5 14 .5S.5 6.544.5 14 6.544 27.5 14 27.5 27.5 21.456 27.5 14" fill="url(#b)"/><path fill-rule="evenodd" clip-rule="evenodd" d="M8.071 13.163c0-1.478 0-2.219.289-2.784a2.64 2.64 0 0 1 1.154-1.154c.565-.287 1.305-.287 2.784-.287h3.433c1.48 0 2.22 0 2.784.287.497.253.901.657 1.154 1.154.083.162.142.337.183.54h-2.096c-.614 0-.92 0-1.174.055a2.42 2.42 0 0 0-1.852 1.85c-.055.255-.055.562-.055 1.176s0 .921.055 1.176a2.42 2.42 0 0 0 1.851 1.85c.255.056.562.056 1.175.056h2.096c-.042.203-.1.378-.182.539a2.64 2.64 0 0 1-1.154 1.154c-.566.288-1.305.288-2.785.288h-3.433c-1.48 0-2.22 0-2.784-.288A2.64 2.64 0 0 1 8.36 17.62c-.289-.565-.289-1.304-.289-2.784zm7.484.837c0-.822 0-1.232.153-1.55a1.54 1.54 0 0 1 .72-.719c.316-.152.727-.152 1.548-.152h.881c.821 0 1.232 0 1.549.152.314.152.568.405.72.72.152.317.152.727.152 1.549s0 1.232-.153 1.55a1.54 1.54 0 0 1-.72.719c-.317.152-.726.152-1.548.152h-.881c-.822 0-1.232 0-1.549-.152a1.54 1.54 0 0 1-.72-.72c-.152-.317-.152-.727-.152-1.549m2.862 0a.881.881 0 1 1-1.762 0 .881.881 0 0 1 1.762 0" fill="#fff"/></g><defs><linearGradient id="b" x1="14" y1=".5" x2="14" y2="27.5" gradientUnits="userSpaceOnUse"><stop stop-color="#FFB800"/><stop offset="1" stop-color="#F8B406"/></linearGradient><clipPath id="a"><path fill="#fff" d="M.5.5h27v27H.5z"/></clipPath></defs></svg>
+                    <div class="button-title">Token withdrawal</div>
+                </button>
+            </div>
+                <img class="bg-img" src="Elements/Lama_Wallet.png">
+        </div>
+    </div>
+
+    <!-- Меню -->
+    <div class="menu">
+        <button id="friends-btn" onclick="navigate('friends')">
+            <svg width="29" height="28" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16.2917 6.33333C16.2917 9.27885 13.9039 11.6667 10.9583 11.6667C8.01281 11.6667 5.625 9.27885 5.625 6.33333C5.625 3.38781 8.01281 1 10.9583 1C13.9039 1 16.2917 3.38781 16.2917 6.33333Z" fill="white" fill-opacity="0.3" />
+              <path d="M20.2917 21.0013C20.2917 23.9468 16.113 26.3346 10.9583 26.3346C5.80368 26.3346 1.625 23.9468 1.625 21.0013C1.625 18.0558 5.80368 15.668 10.9583 15.668C16.113 15.668 20.2917 18.0558 20.2917 21.0013Z" fill="white" fill-opacity="0.3" />
+              <path d="M26.9565 21.0006C26.9565 23.2097 24.2425 25.0006 20.9288 25.0006C21.905 23.9335 22.5763 22.594 22.5763 21.0025C22.5763 19.4091 21.9035 18.0684 20.9254 17.0007C24.2391 17.0007 26.9565 18.7915 26.9565 21.0006Z" fill="white" fill-opacity="0.3" />
+              <path d="M22.9565 6.33431C22.9565 8.54345 21.1657 10.3343 18.9565 10.3343C18.4748 10.3343 18.013 10.2492 17.5853 10.0931C18.2161 8.98363 18.5763 7.7003 18.5763 6.33282C18.5763 4.96636 18.2166 3.68392 17.5867 2.57502C18.014 2.41927 18.4753 2.33431 18.9565 2.33431C21.1657 2.33431 22.9565 4.12517 22.9565 6.33431Z" fill="white" fill-opacity="0.3" />
+            </svg>
+            Friends
+        </button>
+        <button id="wallet-btn" onclick="navigate('wallet')">
+            <svg width="29" height="28" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M23.9373 11.504C23.8735 11.4999 23.8042 11.5 23.7322 11.5L23.7143 11.5H20.8935C18.5684 11.5 16.5789 13.3446 16.5789 15.75C16.5789 18.1554 18.5684 20 20.8935 20H23.7143L23.7322 20C23.8042 20 23.8735 20.0001 23.9373 19.996C24.8817 19.9359 25.7169 19.191 25.7871 18.1506C25.7917 18.0824 25.7917 18.0089 25.7917 17.9407L25.7917 17.9222V13.5778L25.7917 13.5593C25.7917 13.4911 25.7917 13.4176 25.7871 13.3493C25.7169 12.309 24.8817 11.5641 23.9373 11.504ZM20.6434 16.8833C21.2419 16.8833 21.7272 16.3759 21.7272 15.75C21.7272 15.1241 21.2419 14.6166 20.6434 14.6166C20.0448 14.6166 19.5595 15.1241 19.5595 15.75C19.5595 16.3759 20.0448 16.8833 20.6434 16.8833Z" fill="white" fill-opacity="0.3" />
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M23.7315 21.7C23.8992 21.6956 24.026 21.8521 23.9806 22.0148C23.7548 22.8223 23.3965 23.5104 22.8216 24.0899C21.9801 24.9381 20.913 25.3145 19.5946 25.4931C18.3135 25.6667 16.6767 25.6667 14.6101 25.6666H12.2343C10.1677 25.6667 8.53084 25.6667 7.2498 25.4931C5.93141 25.3145 4.86432 24.9381 4.02278 24.0899C3.18125 23.2418 2.80779 22.1663 2.63053 20.8375C2.4583 19.5464 2.45832 17.8967 2.45833 15.8139V15.686C2.45832 13.6032 2.4583 11.9535 2.63053 10.6624C2.80779 9.33368 3.18125 8.2582 4.02278 7.41006C4.86432 6.56191 5.93141 6.18551 7.24979 6.00687C8.53084 5.83328 10.1677 5.8333 12.2343 5.83331L14.6101 5.83331C16.6767 5.8333 18.3135 5.83328 19.5946 6.00687C20.913 6.18551 21.9801 6.56191 22.8216 7.41006C23.3965 7.98951 23.7548 8.67769 23.9806 9.48512C24.026 9.64784 23.8991 9.80437 23.7315 9.79999L20.8934 9.79999C17.7036 9.79999 14.8921 12.3397 14.8921 15.75C14.8921 19.1603 17.7036 21.7 20.8934 21.7L23.7315 21.7ZM6.6752 10.3666C6.20942 10.3666 5.83183 10.7472 5.83183 11.2166C5.83183 11.6861 6.20942 12.0666 6.6752 12.0666H11.1732C11.639 12.0666 12.0166 11.6861 12.0166 11.2166C12.0166 10.7472 11.639 10.3666 11.1732 10.3666H6.6752Z" fill="white" fill-opacity="0.3" />
+              <path d="M9.19779 4.6951L11.4831 3.01145C12.7103 2.10727 14.373 2.10727 15.6003 3.01145L17.8976 4.70395C16.937 4.66659 15.8644 4.66662 14.6883 4.66665H12.156C11.0814 4.66662 10.0931 4.6666 9.19779 4.6951Z" fill="white" fill-opacity="0.3" />
+            </svg>
+            Wallet
+        </button>
+    </div>
+    <script>
+        eruda.init();
+        function navigate(section) {
+            // Скрыть все разделы
+            document.getElementById('friends-section').classList.add('hidden');
+            document.getElementById('wallet-section').classList.add('hidden');
+            
+            // Показать выбранный раздел
+            document.getElementById(section + '-section').classList.remove('hidden');
+            
+            // Убрать активный класс со всех кнопок
+            document.getElementById('friends-btn').classList.remove('active');
+            document.getElementById('wallet-btn').classList.remove('active');
+            
+            // Добавить активный класс к выбранной кнопке
+            document.getElementById(section + '-btn').classList.add('active');
+        }
+    
+        function inviteFriend() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}referral.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const referralLink = `https://t.me/Testtestclickerclickerbot/start?startapp=${data.referral_code}`;
+                        const shareLink = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent("Join me in this amazing game!")}`;
+                        Telegram.WebApp.openTelegramLink(shareLink);
+                    } else {
+                        console.error('Error generating referral code:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error generating referral code:', error);
+                });
+        }
+    
+        function fetchReferralLink(userId) {
+            const url = `${CONFIG.BASE_URL}referral.php?telegram_id=${userId}`;
+        
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response data:', data);
+                    if (data.success) {
+                        referralLink = `https://t.me/Testtestclickerclickerbot/start?startapp=${data.referral_code}`;
+                        console.log('Referral Link:', referralLink);
+                    } else {
+                        console.error('Error generating referral code:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error generating referral code:', error);
+                });
+        }
+    
+        // Функция для копирования реферальной ссылки
+        function copyReferralLink() {
+            if (referralLink) {
+                navigator.clipboard.writeText(referralLink).then(() => {
+                    alert('Referral link copied to clipboard!');
+                }).catch(err => {
+                    console.error('Could not copy text: ', err);
+                });
+            } else {
+                alert('Referral link is not available. Please try again later.');
+            }
+        }
+    
+        function loadFriends() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}get_friends.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const friendsList = document.getElementById('friendsList');
+                        friendsList.innerHTML = '';
+                        data.friends.forEach(friend => {
+                            const friendItem = document.createElement('div');
+                            friendItem.className = 'friend-item';
+                            friendItem.innerHTML = `
+                                <div class="wrap">
+                                    <img src="${friend.profile_img_url || 'default_profile_img.png'}" alt="Friend">
+                                </div>
+                                <div class="info">
+                                    <h4>${friend.full_name}</h4>
+                                    <p>● ${friend.league}</p>
+                                </div>
+                            `;
+                            friendsList.appendChild(friendItem);
+                        });
+                        document.getElementById('friendsTitle').innerText = `List of your friends (${data.friends.length})`;
+                    } else {
+                        console.error('Error fetching friends:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching friends:', error);
+                });
+        }
+    
+        function toggleBonuses() {
+            const bonusList = document.getElementById('bonusList');
+            if (bonusList.style.display === 'none' || bonusList.style.display === '') {
+                bonusList.style.display = 'block';
+                loadBonuses();
+            } else {
+                bonusList.style.display = 'none';
+            }
+        }
+    
+        function loadBonuses() {
+            const bonusList = document.getElementById('bonusList');
+            bonusList.innerHTML = `
+                <div class="bonus-item">
+                    <div class="image-container">
+                        <svg class="blur-object" width="89" height="89" viewBox="0 0 89 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g filter="url(#filter0_f_1_95)">
+                            <circle cx="44.5" cy="44.5" r="14.5" fill="url(#paint0_linear_1_95)" />
+                          </g>
+                          <defs>
+                            <filter id="filter0_f_1_95" x="0" y="0" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                              <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur_1_95" />
+                            </filter>
+                            <linearGradient id="paint0_linear_1_95" x1="44.5" y1="-16.4" x2="44.5" y2="59" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#2FB8FF" />
+                              <stop offset="1" stop-color="#9EECD9" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <img src="Elements/present.png" alt="Gift">
+                    </div>
+                    <div class="text">
+                        <h3>Silver</h3>
+                        <p>For friend: +20,000</p>
+                        <p>Premium: +25,000</p>
+                    </div>
+                </div>
+                <div class="bonus-item">
+                    <div class="image-container">
+                        <svg class="blur-object" width="89" height="89" viewBox="0 0 89 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g filter="url(#filter0_f_1_95)">
+                            <circle cx="44.5" cy="44.5" r="14.5" fill="url(#paint0_linear_1_95)" />
+                          </g>
+                          <defs>
+                            <filter id="filter0_f_1_95" x="0" y="0" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                              <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur_1_95" />
+                            </filter>
+                            <linearGradient id="paint0_linear_1_95" x1="44.5" y1="-16.4" x2="44.5" y2="59" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#2FB8FF" />
+                              <stop offset="1" stop-color="#9EECD9" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <img src="Elements/present.png" alt="Gift">
+                    </div>
+                    <div class="text">
+                        <h3>Gold</h3>
+                        <p>For friend: +30,000</p>
+                        <p>Premium: +50,000</p>
+                    </div>
+                </div>
+                <div class="bonus-item">
+                    <div class="image-container">
+                        <svg class="blur-object" width="89" height="89" viewBox="0 0 89 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g filter="url(#filter0_f_1_95)">
+                            <circle cx="44.5" cy="44.5" r="14.5" fill="url(#paint0_linear_1_95)" />
+                          </g>
+                          <defs>
+                            <filter id="filter0_f_1_95" x="0" y="0" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                              <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur_1_95" />
+                            </filter>
+                            <linearGradient id="paint0_linear_1_95" x1="44.5" y1="-16.4" x2="44.5" y2="59" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#2FB8FF" />
+                              <stop offset="1" stop-color="#9EECD9" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <img src="Elements/present.png" alt="Gift">
+                    </div>
+                    <div class="text">
+                        <h3>Platinum</h3>
+                        <p>For friend: +50,000</p>
+                        <p>Premium: +75,000</p>
+                    </div>
+                </div>
+                <div class="bonus-item">
+                    <div class="image-container">
+                        <svg class="blur-object" width="89" height="89" viewBox="0 0 89 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g filter="url(#filter0_f_1_95)">
+                            <circle cx="44.5" cy="44.5" r="14.5" fill="url(#paint0_linear_1_95)" />
+                          </g>
+                          <defs>
+                            <filter id="filter0_f_1_95" x="0" y="0" width="89" height="89" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                              <feGaussianBlur stdDeviation="15" result="effect1_foregroundBlur_1_95" />
+                            </filter>
+                            <linearGradient id="paint0_linear_1_95" x1="44.5" y1="-16.4" x2="44.5" y2="59" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#2FB8FF" />
+                              <stop offset="1" stop-color="#9EECD9" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <img src="Elements/present.png" alt="Gift">
+                    </div>
+                    <div class="text">
+                        <h3>Diamond</h3>
+                        <p>For friend: +100,000</p>
+                        <p>Premium: +150,000</p>
+                    </div>
+                </div>
+            `;
+        }
+    
+        function updateLastActivity() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}update_last_activity.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('Error updating last activity:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating last activity:', error);
+                });
+        }
+    
+        async function initWallet() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+            } else {
+                console.error("Telegram Web App не инициализирован");
+                return;
+            }
+
+            const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                manifestUrl: 'https://41363c7867a2.ngrok.app/telegram/tonconnect-manifest.json',
+                buttonRootId: 'connect-button'
+            });
+
+            tonConnectUI.uiOptions = {
+                language: 'ru',
+                uiPreferences: {
+                    theme: TON_CONNECT_UI.THEME.DARK,
+                    borderRadius: 's',
+                    colorsSet: {
+                        [TON_CONNECT_UI.THEME.DARK]: {
+                            connectButton: {
+                                background: '#29CC6A'
+                            }
+                        }
+                    }
+                }
+            };
+
+            try {
+                const walletsList = await tonConnectUI.getWallets();
+                console.log('Available wallets:', walletsList);
+            } catch (error) {
+                console.error('Error fetching wallets:', error);
+            }
+
+            const unsubscribe = tonConnectUI.onStatusChange(wallet => {
+                if (wallet) {
+                    console.log('Wallet connected:', wallet);
+                    handleWalletConnected(wallet);
+                } else {
+                    console.log('Wallet disconnected');
+                    handleWalletDisconnected();
+                }
+            });
+
+            function handleWalletConnected(wallet) {
+                console.log('Connected wallet object:', wallet);
+                let wallet_hash = wallet.account ? wallet.account.address : 'Address not found';
+                console.log('Connected wallet hash:', wallet_hash);
+
+
+                let wallet_address;
+                try {
+                    const tonweb = new TonWeb();
+                    const walletAddress = new tonweb.utils.Address(wallet_hash);
+                    wallet_address = walletAddress.toString(true, true, true);
+                    console.log('Connected wallet address:', wallet_address);
+                } catch (e) {
+                    console.error('Error converting address:', e);
+                    wallet_address = 'Conversion error';
+                }
+
+                saveWalletToDB(wallet_address, wallet_hash);
+            }
+
+            function handleWalletDisconnected() {
+                console.log('Wallet has been disconnected');
+            }
+
+            function saveWalletToDB(wallet_address, wallet_hash) {
+                const telegramId = Telegram.WebApp.initDataUnsafe.user.id;
+                const formData = new FormData();
+                formData.append('telegram_id', telegramId);
+                formData.append('wallet_address', wallet_address);
+                formData.append('wallet_hash', wallet_hash);
+
+                fetch('save_wallet.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Wallet saved successfully');
+                    } else {
+                        console.error('Error saving wallet:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving wallet:', error);
+                });
+            }
+
+            // Вызов функции стилизации кнопки после её создания
+            setTimeout(styleConnectButton, 1000);  // Подождать 1 секунду перед применением стилей
+        }
+
+
+
+
+        function styleConnectButton() {
+            const connectButton = document.querySelector('#connect-button button');
+            const screenWidth = window.innerWidth;
+            const buttonWidth = screenWidth * 0.9 + 'px';
+            if (connectButton) {
+                connectButton.style.display = 'flex';
+                connectButton.style.justifyContent = 'center';
+                connectButton.style.alignItems = 'center';
+                connectButton.style.flexDirection = 'row';
+                connectButton.style.width = buttonWidth;
+                connectButton.style.height = '48px';
+                connectButton.style.background = 'linear-gradient(90deg, #109CFC, #0A5D96)';
+                connectButton.style.border = 'none';
+                connectButton.style.borderRadius = '8px';
+                connectButton.style.padding = '10.5px 0';
+                connectButton.style.boxSizing = 'border-box';
+                connectButton.style.marginTop = '5%';
+                connectButton.style.transition = 'transform 0.3s ease';
+                connectButton.style.userSelect = 'none';
+                connectButton.style.fontFamily = "'Inter', sans-serif";
+                connectButton.style.fontWeight = '500';
+                connectButton.style.fontSize = '16px';
+                connectButton.style.color = '#FFFFFF';
+                connectButton.textContent = 'Connect your Wallet'; // Change button text
+
+                const svgData = `
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_1_206)">
+                    <path d="M27.5 14C27.5 6.54416 21.4558 0.5 14 0.5C6.54416 0.5 0.5 6.54416 0.5 14C0.5 21.4558 6.54416 27.5 14 27.5C21.4558 27.5 27.5 21.4558 27.5 14Z" fill="url(#paint0_linear_1_206)" />
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8.07147 13.163C8.07147 11.6847 8.07147 10.9443 8.3597 10.3793C8.61296 9.88235 9.017 9.47831 9.51395 9.22505C10.0789 8.9375 10.8187 8.9375 12.2976 8.9375H15.7314C17.211 8.9375 17.9501 8.9375 18.5151 9.22505C19.012 9.47831 19.4161 9.88235 19.6693 10.3793C19.7517 10.5413 19.8111 10.7161 19.8522 10.9186H17.7564C17.1421 10.9186 16.8357 10.9186 16.5819 10.974C16.1283 11.0726 15.7126 11.2994 15.3844 11.6276C15.0561 11.9557 14.8291 12.3713 14.7303 12.8248C14.675 13.0793 14.675 13.3864 14.675 14C14.675 14.6142 14.675 14.9214 14.7303 15.1758C14.829 15.6293 15.056 16.0448 15.3841 16.3729C15.7122 16.7011 16.1278 16.928 16.5812 17.0267C16.8357 17.082 17.1428 17.082 17.7564 17.082H19.8522C19.8104 17.2845 19.7517 17.46 19.67 17.6207C19.4168 18.1177 19.0127 18.5217 18.5157 18.7749C17.9501 19.0632 17.211 19.0632 15.7314 19.0632H12.2976C10.8187 19.0632 10.0789 19.0632 9.51395 18.7749C9.01697 18.5217 8.61292 18.1177 8.3597 17.6207C8.07147 17.0557 8.07147 16.3166 8.07147 14.837V13.1643V13.163ZM15.5552 14C15.5552 13.1785 15.5552 12.7681 15.7077 12.4509C15.8596 12.1363 16.1127 11.8825 16.4273 11.7313C16.7445 11.5788 17.1549 11.5788 17.9764 11.5788H18.8573C19.6781 11.5788 20.0892 11.5788 20.4057 11.7313C20.7203 11.8825 20.9741 12.1363 21.126 12.4509C21.2785 12.7681 21.2785 13.1785 21.2785 14C21.2785 14.8215 21.2785 15.2319 21.1253 15.5491C20.9741 15.863 20.7203 16.1168 20.4057 16.2687C20.0885 16.4212 19.6788 16.4212 18.8573 16.4212H17.9757C17.1543 16.4212 16.7439 16.4212 16.4273 16.2687C16.1126 16.1173 15.8587 15.8636 15.7071 15.5491C15.5545 15.2319 15.5545 14.8215 15.5545 14H15.5552ZM18.4172 14C18.4172 14.2336 18.3244 14.4577 18.1592 14.6229C17.994 14.7881 17.7699 14.8809 17.5363 14.8809C17.3027 14.8809 17.0786 14.7881 16.9134 14.6229C16.7483 14.4577 16.6554 14.2336 16.6554 14C16.6554 13.7664 16.7483 13.5423 16.9134 13.3771C17.0786 13.2119 17.3027 13.1191 17.5363 13.1191C17.7699 13.1191 17.994 13.2119 18.1592 13.3771C18.3244 13.5423 18.4172 13.7664 18.4172 14Z" fill="white" />
+                  </g>
+                  <defs>
+                    <linearGradient id="paint0_linear_1_206" x1="14" y1="0.5" x2="14" y2="27.5" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#60BFEF" />
+                      <stop offset="1" stop-color="#0094FE" />
+                    </linearGradient>
+                    <clipPath id="clip0_1_206">
+                      <rect width="27" height="27" fill="white" transform="translate(0.5 0.5)" />
+                    </clipPath>
+                  </defs>
+                </svg>
+                `;
+
+                const blob = new Blob([svgData], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+
+                // Adding an icon
+                const icon = document.createElement('img');
+                icon.src = url; // Change this to your icon path
+                icon.style.marginRight = '5px';
+                icon.style.width = '27px';
+                icon.style.height = '27px';
+                connectButton.insertBefore(icon, connectButton.firstChild);
+            } else {
+                console.error("Connect button not found");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFriends();
+            initWallet();  // initWallet вызывается здесь
+            const userId1 = Telegram.WebApp.initDataUnsafe.user.id;
+            console.log('User ID:', userId1);
+            fetchReferralLink(userId1);
+            Telegram.WebApp.ready();
+            console.log("Telegram WebApp is ready");
+
+            Telegram.WebApp.expand();
+
+            // Setup back button
+            Telegram.WebApp.BackButton.show();
+            console.log("Back button setup complete");
+
+            window.Telegram.WebView.onEvent('back_button_pressed', back_button_pressed);
+            function back_button_pressed() {
+                console.log("Back button pressed");
+                Telegram.WebApp.BackButton.hide();
+                window.location.href = 'index.html';
+            }
+            setInterval(updateLastActivity, 60000); // Отправка активности каждые 60 секунд
+
+            navigate('friends'); // Отобразить раздел Friends по умолчанию
+        });
+
+    </script>
+
+</body>
+</html>

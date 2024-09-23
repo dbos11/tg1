@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Clicker Website</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@300;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+            overflow: hidden;
+            font-family: 'Helvetica', Arial, sans-serif;
+            color: #FFFFFF;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #000000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            background-color: #000000;
+            transform-origin: center;
+            border-radius: 15px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .content {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            position: relative;
+            background-size: cover;
+            position: relative;
+            background: url('file:///C:/Users/freki/Downloads/2.jpg') no-repeat center center;
+        }
+
+        .section {
+            display: none;
+            padding: 20px;
+            box-sizing: border-box;
+            width: 100%;
+            height: calc(100% - 60px);
+            overflow-y: auto;
+        }
+
+        .section.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .nav-buttons {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background-color: #000000;
+            padding: 10px 0;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        
+
+        .league-name {
+            font-size: 34px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+            color: #FFFFFF;
+            font-family: 'Helvetica', Arial, sans-serif;
+        }
+
+        .league-image {
+            display: block;
+            margin: 20px auto;
+            max-width: 75%;
+            height: auto;
+            border-radius: 20%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+            transition: transform 0.3s, box-shadow 0.3s;
+            z-index: 2;
+        }
+        .glow-bronze {
+            box-shadow: 0 0 150px 50px #cd7f32;
+        }
+
+        .glow-silver {
+            box-shadow: 0 0 150px 50px #c0c0c0;
+        }
+
+        .glow-gold {
+            box-shadow: 0 0 150px 50px #ffd700;
+        }
+
+        .glow-platinum {
+            box-shadow: 0 0 150px 50px #e5e4e2;
+        }
+
+        .glow-diamond {
+            box-shadow: 0 0 150px 50px #b9f2ff;
+        }
+
+        .league-image:hover {
+            transform: scale(1.07);
+        }
+
+        .league-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+        }
+
+        .button1 {
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            background-color: #000000;
+            font-size: 25px;
+            font-weight: bold;
+            border-radius: 1px;
+            transition: background-color 0.3s, transform 0.3s;
+            font-family: 'Helvetica', Arial, sans-serif;
+            z-index: 1;
+            -webkit-tap-highlight-color: transparent;
+            
+        }
+
+        .button1 img{
+            transform: scaleX(-1);
+        }
+
+        .button2 {
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            background-color: #000000;
+            font-size: 25px;
+            font-weight: bold;
+            border-radius: 1px;
+            transition: background-color 0.3s, transform 0.3s;
+            font-family: 'Helvetica', Arial, sans-serif;
+            z-index: 1;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        
+
+        .top-players {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .top-players h2 {
+            font-size: 34px;
+            margin: 20px 0;
+            color: #FFFFFF;
+            font-family: 'Helvetica', Arial, sans-serif;
+        }
+
+        .player {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            background-color: #282B30;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
+       
+
+        .player .player-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .player .player-rank {
+            font-weight: 700;
+            font-size: 18px;
+            margin-right: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Helvetica', Arial, sans-serif;
+            margin-left: auto;
+        }
+
+        .player .player-name {
+            font-size: 16px;
+            margin: 0;
+            font-family: 'Helvetica', Arial, sans-serif;
+        }
+
+        .player-balance {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+        .player-balance img {
+            width: 18px;
+            height: 18px;
+            margin-right: 5px;
+        }
+        .player-balance span {
+            font-size: 14px;
+            color: #FFD700; /* Gold color */
+            font-weight: bold;
+        }
+
+        .player .player-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            margin-right: 10px;
+            margin-left: 5px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #2c2f33;
+            border-radius: 20px;
+            margin: 10px 0;
+            height: 10px;
+            display: none; /* Initially hidden */
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #ff7e5f;
+            border-radius: 20px;
+            width: 0;
+            transition: width 0.5s;
+        }
+        .progress-bronze {
+            background-color: #cd7f32;
+        }
+
+        .progress-silver {
+            background-color: #c0c0c0;
+        }
+
+        .progress-gold {
+            background-color: #ffd700;
+        }
+
+        .progress-platinum {
+            background-color: #e5e4e2;
+        }
+
+        .progress-diamond {
+            background-color: #b9f2ff;
+        }
+
+        .league-info {
+            text-align: center;
+            font-size: 16px;
+            margin-top: 10px;
+            color: #FFFFFF;
+            font-family: 'Helvetica', Arial, sans-serif;
+        }
+        .flipped {
+            transform: scaleY(-1);
+        }
+        
+        
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script src="configJS.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <div id="leagues" class="section active">
+                
+                <div class="league-navigation">
+                    <button class="button1" id="previous-league-button" onclick="changeLeague(-1)">
+                        <img src="Elements/arrow.png" alt="Details">
+                    </button>
+                    <img id="league-image" class="league-image" src="Elements/coin_icon.svg" alt="League Image">
+                    <button class="button2" id="next-league-button" onclick="changeLeague(1)"><img src="Elements/arrow.png" alt="Details"></button>
+                </div>
+                <div class="league-name" id="player-league">Bronze</div>
+                <div class="league-info" id="league-info"></div>
+                <div class="progress-bar-container" id="progress-bar-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="top-players" id="top-players">
+                    <h2>Top Players</h2>
+                    <!-- Players will be listed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        //eruda.init();
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+        let currentLeagueIndex = 0;
+        let leagues = [];
+        let players = {};
+        let balance = 0;
+        let currentLeague = 'Bronze';
+        const leagueThresholds = {
+            'Bronze': 0,
+            'Silver': 10,
+            'Gold': 50,
+            'Platinum': 100,
+            'Diamond': 200
+        };
+
+        function adjustScale() {
+            const container = document.querySelector('.container');
+            const scale = Math.min(window.innerWidth / 375, window.innerHeight / 667);
+            container.style.transform = `scale(${scale})`;
+        }
+
+        function updatePlayerLeague() {
+
+            const nextLeagueButton = document.getElementById('previous-league-button');
+            if (currentLeagueIndex === 0) {
+                nextLeagueButton.style.visibility = 'hidden';
+            } else {
+                nextLeagueButton.style.visibility = 'visible';
+            }
+            const nextLeagueButton2 = document.getElementById('next-league-button');
+            if (currentLeagueIndex === 4) {
+                nextLeagueButton2.style.visibility = 'hidden';
+            } else {
+                nextLeagueButton2.style.visibility = 'visible';
+            }
+
+            const leagueName = document.getElementById('player-league');
+            leagueName.innerText = `${leagues[currentLeagueIndex]}`;
+
+            const leagueImage = document.getElementById('league-image');
+            leagueImage.src = `images/${leagues[currentLeagueIndex].toLowerCase()}.jpg`;
+
+            const leagueInfo = document.getElementById('league-info');
+            const progressBarContainer = document.getElementById('progress-bar-container');
+            const progressBar = document.getElementById('progress-bar');
+
+            leagueImage.classList.remove('glow-bronze', 'glow-silver', 'glow-gold', 'glow-platinum', 'glow-diamond');
+            progressBar.classList.remove('progress-bronze', 'progress-silver', 'progress-gold', 'progress-platinum', 'progress-diamond');
+
+            // Add the appropriate glow and progress bar classes
+            const leagueClass = `glow-${leagues[currentLeagueIndex].toLowerCase()}`;
+            leagueImage.classList.add(leagueClass);
+            const progressClass = `progress-${leagues[currentLeagueIndex].toLowerCase()}`;
+            progressBar.classList.add(progressClass);
+
+            if (leagues[currentLeagueIndex] === currentLeague) {
+                const nextLeague = leagues[currentLeagueIndex + 1] || leagues[currentLeagueIndex];
+                const nextLeagueBalance = leagueThresholds[nextLeague];
+                leagueInfo.innerText = `${balance} / ${nextLeagueBalance}`;
+                progressBarContainer.style.display = 'block';
+                progressBar.style.width = `${Math.min((balance / nextLeagueBalance) * 100, 100)}%`;
+            } else {
+                leagueInfo.innerText = `From: ${leagueThresholds[leagues[currentLeagueIndex]]} coins`;
+                progressBarContainer.style.display = 'none';
+            }
+
+            const topPlayers = document.getElementById('top-players');
+            const leaguePlayers = players[leagues[currentLeagueIndex]];
+
+            topPlayers.innerHTML = `
+                ${leaguePlayers.map((player, index) => `
+                    <div class="player">
+                        <img class="player-avatar" src="${player.profile_img_url}" alt="Avatar">
+                        <div class="player-info">
+                            <span class="player-name">${player.full_name}</span>
+                            <div class="player-balance">
+                                <img src="Elements/coin_icon.svg" alt="Coin Icon">
+                                <span class="player-coins">${player.balance}</span>
+                            </div>
+                        </div>
+                        <p class="player-rank">${index + 1}</p>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function changeLeague(direction) {
+            currentLeagueIndex += direction;
+            if (currentLeagueIndex < 0) currentLeagueIndex = 0;
+            if (currentLeagueIndex >= leagues.length) currentLeagueIndex = leagues.length - 1;
+            updatePlayerLeague();
+        }
+
+        function fetchLeagues() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}get_leagues.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        leagues = data.leagues;
+                        players = data.players;
+                        currentLeague = sessionStorage.getItem('league');
+                        balance = parseInt(sessionStorage.getItem('balance'));
+                        console.log("Fetched data: ", data); // Add this line to log fetched data
+                        currentLeagueIndex = leagues.indexOf(currentLeague);
+                        updatePlayerLeague();
+                    } else {
+                        console.error('Error fetching leagues:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching leagues:', error);
+                });
+        }
+
+        function updateLastActivity() {
+            const userId = Telegram.WebApp.initDataUnsafe.user.id;
+            fetch(`${CONFIG.BASE_URL}update_last_activity.php?telegram_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('Error updating last activity:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating last activity:', error);
+                });
+        }
+
+        window.addEventListener('resize', adjustScale);
+        window.addEventListener('load', () => {
+            adjustScale();
+            fetchLeagues();
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            Telegram.WebApp.ready();
+            console.log("Telegram WebApp is ready");
+
+            Telegram.WebApp.expand();
+
+            // Setup back button
+            Telegram.WebApp.BackButton.show();
+            console.log("Back button setup complete");
+
+            window.Telegram.WebView.onEvent('back_button_pressed', back_button_pressed);
+            function back_button_pressed() {
+                console.log("Back button pressed");
+                if (window.history.length > 1) {
+                    window.history.back();
+                    Telegram.WebApp.BackButton.hide();
+                } else {
+                    // If no history, close the web view
+                    Telegram.WebApp.close();
+                }
+            }
+            setInterval(updateLastActivity, 60000); // Отправка активности каждые 5 секунд
+        });
+    </script>
+</body>
+</html>
